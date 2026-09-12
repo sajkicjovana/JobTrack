@@ -1,0 +1,362 @@
+<div class="interviews-page">
+
+  <div class="page-container">
+
+    <div class="page-header">
+
+      <div>
+        <h1>Interviews</h1>
+        <p>
+          Keep track of upcoming and completed interviews.
+        </p>
+      </div>
+
+      @if (!showForm) {
+        <button
+          type="button"
+          class="add-button"
+          (click)="openForm()">
+          <span>+</span>
+          Add Interview
+        </button>
+      }
+
+    </div>
+
+
+    @if (showForm) {
+
+      <div class="form-wrapper">
+
+        <div class="form-header">
+
+          <div>
+            @if (editingInterview) {
+              <h2>Edit Interview</h2>
+              <p>Update interview information.</p>
+            } @else {
+              <h2>New Interview</h2>
+              <p>
+                Schedule an interview for one of your applications.
+              </p>
+            }
+          </div>
+
+
+          <div class="header-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="closeForm()">
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              form="interviewForm"
+              class="save-button">
+
+              @if (editingInterview) {
+                Save Changes
+              } @else {
+                Add Interview
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <form
+          id="interviewForm"
+          (ngSubmit)="onSubmit()">
+
+          <div class="form-grid">
+
+            <div class="form-group">
+
+              <label>Job Application</label>
+
+              <select
+                name="jobApplicationId"
+                [(ngModel)]="jobApplicationId"
+                required>
+
+                <option
+                  [ngValue]="null"
+                  disabled>
+                  Select application
+                </option>
+
+                @for (
+                  application of applications;
+                  track application.id
+                ) {
+                  <option
+                    [ngValue]="application.id">
+                    {{ application.companyName }}
+                    — {{ application.position }}
+                  </option>
+                }
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Interview Type</label>
+
+              <select
+                name="type"
+                [(ngModel)]="type">
+
+                <option value="HR">
+                  HR Interview
+                </option>
+
+                <option value="Technical">
+                  Technical Interview
+                </option>
+
+                <option value="Other">
+                  Other
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Date & Time</label>
+
+              <input
+                #interviewDateInput
+                type="datetime-local"
+                name="interviewDate"
+                [(ngModel)]="interviewDate"
+                (click)="
+                  interviewDateInput.showPicker()
+                "
+                required
+              />
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Contact Person</label>
+
+              <input
+                type="text"
+                name="contactPerson"
+                [(ngModel)]="contactPerson"
+                placeholder="e.g. Ana Petrović"
+              />
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Outcome</label>
+
+              <select
+                name="outcome"
+                [(ngModel)]="outcome">
+
+                <option value="">
+                  Not decided yet
+                </option>
+
+                <option value="Passed">
+                  Passed
+                </option>
+
+                <option value="Rejected">
+                  Rejected
+                </option>
+
+                <option value="Cancelled">
+                  Cancelled
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group notes-group">
+
+            <label>Notes</label>
+
+            <textarea
+              name="notes"
+              [(ngModel)]="notes"
+              rows="2"
+              placeholder="Questions, preparation notes, important details..."
+            ></textarea>
+
+          </div>
+
+        </form>
+
+      </div>
+    }
+
+
+    @if (interviews.length === 0) {
+
+      <div class="empty-state">
+
+        <h3>No interviews yet</h3>
+
+        <p>
+          Add an interview when one of your applications moves forward.
+        </p>
+
+      </div>
+
+    } @else {
+
+      <div class="interviews-grid">
+
+        @for (
+          interview of interviews;
+          track interview.id
+        ) {
+
+          <article class="interview-card">
+
+            <div class="card-top">
+
+              <div>
+                <h2>
+                  {{ interview.companyName }}
+                </h2>
+
+                <p class="position">
+                  {{ interview.position }}
+                </p>
+              </div>
+
+
+              <div class="card-actions">
+
+                <span class="type-badge">
+                  {{ getTypeLabel(interview.type) }}
+                </span>
+
+
+                <button
+                  type="button"
+                  class="icon-button"
+                  title="Edit interview"
+                  (click)="openEditForm(interview)">
+                  ✎
+                </button>
+
+
+                <button
+                  type="button"
+                  class="icon-button delete-icon"
+                  title="Delete interview"
+                  (click)="
+                    deleteInterview(interview.id)
+                  ">
+                  🗑
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div class="interview-details">
+
+              <div class="detail-item">
+                <span class="detail-label">
+                  Date & Time
+                </span>
+
+                <span>
+                  {{
+                    formatDateTime(
+                      interview.interviewDate
+                    )
+                  }}
+                </span>
+              </div>
+
+
+              <div class="detail-item">
+
+                <span class="detail-label">
+                  Contact
+                </span>
+
+                <span>
+                  {{
+                    interview.contactPerson ||
+                    'Not specified'
+                  }}
+                </span>
+
+              </div>
+
+
+              <div class="detail-item">
+
+                <span class="detail-label">
+                  Outcome
+                </span>
+
+                <span>
+                  {{
+                    getOutcomeLabel(
+                      interview.outcome
+                    )
+                  }}
+                </span>
+
+              </div>
+
+            </div>
+
+
+            @if (interview.notes) {
+
+              <div class="notes">
+
+                <span class="detail-label">
+                  Notes
+                </span>
+
+                <p>
+                  {{ interview.notes }}
+                </p>
+
+              </div>
+
+            }
+
+          </article>
+
+        }
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

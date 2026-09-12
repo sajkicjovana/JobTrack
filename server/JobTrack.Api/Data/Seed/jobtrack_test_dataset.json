@@ -1,0 +1,2996 @@
+{
+  "datasetName": "JobTrack Interview Preparation - Final Study Dataset",
+  "language": "en",
+  "version": "3.0",
+  "topics": [
+    {
+      "technologyName": "C#",
+      "name": "Types and OOP",
+      "content": "## The C# type system\n\nC# is a statically typed language: every expression has a type known to the compiler. The type determines which values can be stored and which operations are allowed. C# types are usually discussed as **value types** and **reference types**.\n\nValue types contain their data directly. Examples include `int`, `double`, `bool`, `char`, enums and user-defined `struct` types. When one value-type variable is assigned to another, the value is copied.\n\nReference-type variables hold a reference to an object. Classes, arrays, delegates and `string` are reference types. Assigning one class variable to another normally copies the reference, so both variables can point to the same object.\n\n```csharp\nint a = 5;\nint b = a;\nb = 10;\n// a is still 5\n\nvar first = new Person { Name = \"Ana\" };\nvar second = first;\nsecond.Name = \"Mila\";\n// first.Name is now \"Mila\" because both variables refer to the same object\n```\n\n### Nullable values\n\nA non-nullable value type such as `int` normally cannot contain `null`. A nullable value type is written with `?`, for example `int?`. Reference types can also participate in nullable reference type analysis, where `string` and `string?` express different nullability intentions to the compiler.\n\n## Classes and objects\n\nA **class** defines the structure and behavior of objects. It can contain fields, properties, methods, constructors and events. An object is an instance of a class.\n\n```csharp\npublic class User\n{\n    public string Name { get; set; }\n\n    public User(string name)\n    {\n        Name = name;\n    }\n\n    public void PrintName()\n    {\n        Console.WriteLine(Name);\n    }\n}\n```\n\nA constructor initializes a new instance. Properties are commonly used instead of exposing fields directly because they provide a controlled public API.\n\n## Inheritance and polymorphism\n\nA class can inherit from one direct base class. A derived class receives accessible members from its base class and can add new behavior.\n\nTo allow a derived class to replace a base implementation polymorphically, the base member is commonly declared `virtual` or `abstract`, and the derived member uses `override`.\n\n```csharp\npublic class Animal\n{\n    public virtual void Speak()\n    {\n        Console.WriteLine(\"Animal sound\");\n    }\n}\n\npublic class Dog : Animal\n{\n    public override void Speak()\n    {\n        Console.WriteLine(\"Woof\");\n    }\n}\n```\n\nIf an `Animal` variable refers to a `Dog`, calling `Speak()` executes the overridden `Dog` implementation. This is runtime polymorphism.\n\nAn **abstract class** cannot be instantiated directly. It can contain implemented members as well as abstract members that derived classes must implement.\n\nA **sealed class** cannot be inherited from. A sealed override can also prevent further overriding of a particular member.\n\n## Interfaces\n\nAn interface describes a contract: it states which members a type exposes without requiring callers to depend on one concrete implementation.\n\n```csharp\npublic interface INotificationService\n{\n    void Send(string message);\n}\n\npublic class EmailNotificationService : INotificationService\n{\n    public void Send(string message)\n    {\n        Console.WriteLine($\"Email: {message}\");\n    }\n}\n```\n\nA class can implement multiple interfaces. This is useful for dependency injection and testability because code can depend on an abstraction instead of a concrete class.\n\n## Encapsulation and access modifiers\n\nAccess modifiers control where members can be used.\n\n- `public` — accessible from any code that can access the containing type.\n- `private` — accessible only inside the containing type.\n- `protected` — accessible in the containing type and derived types.\n- `internal` — accessible inside the same assembly.\n\nEncapsulation means keeping an object's internal state controlled through a clear public API.\n\n## Key points\n\n- Value-type assignment copies the value; reference-type assignment normally copies the reference.\n- A class is a reference type and can participate in inheritance.\n- `virtual`/`abstract` in a base class and `override` in a derived class enable polymorphic replacement.\n- Interfaces define contracts and a class can implement more than one interface.\n- Abstract classes cannot be instantiated directly; sealed classes cannot be inherited."
+    },
+    {
+      "technologyName": "C#",
+      "name": "Collections and Language Features",
+      "content": "## Generic collections\n\nThe .NET collection types provide reusable data structures for storing groups of values. Generic collections use type parameters such as `List<string>`, which gives compile-time type safety.\n\n### `List<T>`\n\n`List<T>` is an ordered, index-based collection. It can contain duplicate values.\n\n```csharp\nvar technologies = new List<string>\n{\n    \"Angular\",\n    \"C#\",\n    \"SQL\"\n};\n\ntechnologies.Add(\"Docker\");\nConsole.WriteLine(technologies[0]);\n```\n\n### `Dictionary<TKey, TValue>`\n\nA dictionary stores key/value pairs. Keys must be unique within a dictionary.\n\n```csharp\nvar scores = new Dictionary<string, int>\n{\n    [\"SQL\"] = 90,\n    [\"C#\"] = 80\n};\n\nConsole.WriteLine(scores[\"SQL\"]);\n```\n\n### `HashSet<T>`\n\nA `HashSet<T>` represents a set of unique values and is useful when duplicate elements should not be kept.\n\n## LINQ\n\nLINQ (Language Integrated Query) provides query operations over collections and other supported data sources.\n\nTwo very common operations are:\n\n- `Where` — filters elements according to a condition.\n- `Select` — projects each element into another value or shape.\n\n```csharp\nvar numbers = new List<int> { 1, 2, 3, 4, 5 };\n\nvar result = numbers\n    .Where(n => n % 2 == 0)\n    .Select(n => n * 10);\n\n// 20, 40\n```\n\nOther frequently used LINQ operators include `OrderBy`, `FirstOrDefault`, `Any`, `All`, `Count`, `GroupBy` and `Distinct`.\n\nMany LINQ operations use **deferred execution**: creating the query does not necessarily enumerate the source immediately. Enumeration happens when the result is consumed, for example by `foreach`, `ToList()` or `ToArray()`.\n\n## Exceptions\n\nExceptions represent abnormal conditions that interrupt normal execution.\n\n```csharp\ntry\n{\n    var number = int.Parse(input);\n}\ncatch (FormatException)\n{\n    Console.WriteLine(\"Invalid number.\");\n}\nfinally\n{\n    Console.WriteLine(\"This block runs when control leaves try/catch.\");\n}\n```\n\n- `try` contains code that may fail.\n- `catch` handles a matching exception.\n- `finally` is used for cleanup logic that should run when control leaves the `try`/`catch` structure.\n\nApplications should generally catch exceptions they can meaningfully handle rather than catching every exception and silently ignoring it.\n\n## Resource cleanup and `using`\n\nObjects that implement `IDisposable` represent resources that need deterministic cleanup. A `using` statement or declaration ensures that `Dispose()` is called when the scope ends.\n\n```csharp\nusing var stream = File.OpenRead(\"data.txt\");\n```\n\nThis is especially important for streams, database resources and other unmanaged-resource wrappers.\n\n## Useful type modifiers\n\nThe `sealed` modifier prevents inheritance from a class. It can be useful when a type is not designed to be extended.\n\nThe `static` modifier can be used for classes that contain only static members and are not instantiated.\n\n## Key points\n\n- `List<T>` is ordered and allows duplicates.\n- `Dictionary<TKey,TValue>` maps unique keys to values.\n- `HashSet<T>` stores unique elements.\n- `Where` filters; `Select` transforms.\n- `finally` is intended for cleanup that must run when control leaves the exception-handling structure.\n- `using` is the usual C# pattern for deterministic disposal."
+    },
+    {
+      "technologyName": ".NET",
+      "name": ".NET Platform and Runtime",
+      "content": "## What is .NET?\n\n.NET is a cross-platform, open-source development platform for building many kinds of applications. It includes a runtime, libraries, compilers, development tools and application frameworks such as ASP.NET Core.\n\nA useful mental model is:\n\n- **Language** — for example C#, F# or Visual Basic.\n- **Compiler** — turns source code into .NET intermediate language and metadata.\n- **Runtime** — executes managed application code.\n- **Libraries** — reusable APIs for collections, files, networking, JSON, tasks and many other areas.\n- **Application frameworks** — for example ASP.NET Core for web applications.\n\n## Managed code and execution\n\nCode compiled for .NET is normally **managed code**. The runtime provides services while that code executes, including type safety, exception handling, memory management and runtime services.\n\nA simplified execution path is:\n\n```text\nC# source code\n      ↓\nC# compiler\n      ↓\nIntermediate Language (IL) + metadata in an assembly\n      ↓\n.NET runtime / JIT compilation\n      ↓\nNative machine instructions\n```\n\nThe Just-In-Time (JIT) compiler converts methods into native machine code for execution. Modern .NET also supports other compilation strategies in some deployment scenarios, but JIT compilation is the fundamental runtime model worth understanding for interviews.\n\n## Garbage collection\n\nManaged objects are normally allocated on the managed heap. The garbage collector (GC) automatically reclaims memory occupied by objects that are no longer reachable.\n\nThis means developers normally do **not** manually free managed objects.\n\nThe GC uses generations to make collection efficient:\n\n- Generation 0 usually contains short-lived objects.\n- Generation 1 acts as an intermediate generation.\n- Generation 2 contains longer-lived objects.\n\nGarbage collection manages memory, but it does not replace deterministic cleanup for external resources such as file handles. Types that own such resources commonly implement `IDisposable`.\n\n## Base Class Library\n\nThe Base Class Library provides fundamental APIs used across .NET applications. Examples include:\n\n- collections such as `List<T>` and `Dictionary<TKey,TValue>`;\n- file APIs in `System.IO`;\n- HTTP and networking APIs;\n- JSON serialization;\n- dates and time;\n- tasks and asynchronous programming;\n- reflection and type information.\n\nBecause these APIs are shared across many .NET application models, learning the BCL is more important than memorizing framework-specific helpers.\n\n## Common Type System\n\n.NET languages share a common type system. Types ultimately fit into a unified model rooted in `System.Object`.\n\nThis common runtime model is one reason code written in different .NET languages can interoperate through compatible assemblies and types.\n\n## Target frameworks\n\nA project specifies a target framework such as:\n\n```xml\n<TargetFramework>net9.0</TargetFramework>\n```\n\nThe target framework tells tooling which .NET APIs and runtime capabilities the project expects. NuGet also uses target framework information when selecting compatible package assets.\n\nA target framework is **not** the same thing as the installed SDK version. The SDK is the toolset used to build the project, while the target framework describes the API/runtime target of the project.\n\n## Runtime versus SDK\n\nThe **runtime** is sufficient to run compatible applications.\n\nThe **SDK** includes the runtime plus development tools used to create, restore, build, test and publish applications. A development computer normally needs an SDK; a production machine may only need an appropriate runtime depending on the deployment model.\n\n## Key points\n\n- .NET is a platform, not a single programming language.\n- Source code is compiled into assemblies containing IL and metadata.\n- The runtime executes managed code and provides services such as garbage collection.\n- The BCL contains common reusable APIs.\n- A target framework such as `net9.0` defines the API/runtime target.\n- The SDK is for development; the runtime is the execution environment."
+    },
+    {
+      "technologyName": ".NET",
+      "name": "SDK, Packages and Assemblies",
+      "content": "## The .NET SDK\n\nThe .NET SDK contains tools used throughout the development lifecycle. The `dotnet` command provides a common command-line interface.\n\nTypical commands include:\n\n```bash\ndotnet new webapi\ndotnet restore\ndotnet build\ndotnet run\ndotnet test\ndotnet publish\n```\n\n### `dotnet restore`\n\nRestore resolves project dependencies and makes required NuGet packages available. Modern `dotnet build` performs restore automatically unless restore is disabled, but understanding restore as a separate step is still useful.\n\n### `dotnet build`\n\nBuild compiles the project and its dependencies into output assemblies. It reports compiler errors and warnings.\n\n### `dotnet run`\n\nRun builds the application when needed and starts it. It is convenient during development.\n\n### `dotnet test`\n\nTest builds test projects and runs tests through the configured test framework and test adapter.\n\n### `dotnet publish`\n\nPublish prepares application files for deployment. Depending on settings, a deployment can be framework-dependent or can include more runtime components.\n\n## Project files\n\nModern .NET projects commonly use SDK-style `.csproj` files.\n\n```xml\n<Project Sdk=\"Microsoft.NET.Sdk.Web\">\n  <PropertyGroup>\n    <TargetFramework>net9.0</TargetFramework>\n  </PropertyGroup>\n</Project>\n```\n\nThe project file declares important build information, including:\n\n- target framework;\n- project SDK;\n- package references;\n- project references;\n- build properties.\n\n## NuGet packages\n\nNuGet is the package system used by .NET. A package can contain assemblies, build targets, analyzers and other assets.\n\nA package reference usually appears in the project file:\n\n```xml\n<ItemGroup>\n  <PackageReference\n      Include=\"Npgsql.EntityFrameworkCore.PostgreSQL\"\n      Version=\"9.0.4\" />\n</ItemGroup>\n```\n\nPackage compatibility matters. NuGet uses the project's target framework to select an appropriate compatible asset from a package.\n\n## Assemblies\n\nAn assembly is a compiled .NET unit, commonly a `.dll` or `.exe`. It contains metadata and compiled intermediate language, along with information required by the runtime.\n\nAssemblies define important boundaries for:\n\n- type identity;\n- versioning;\n- loading;\n- references between compiled projects.\n\nA namespace and an assembly are different concepts. A **namespace** organizes type names in source code. An **assembly** is a compiled deployment/versioning unit.\n\n## Project references versus package references\n\nA **project reference** points directly to another project in the same development solution or source tree.\n\nA **package reference** points to a versioned NuGet package.\n\nFor example, a solution with `JobTrack.Api` and `JobTrack.Tests` might use a project reference from the test project to the API project, while the API project uses NuGet package references for EF Core and Npgsql.\n\n## SDK versus runtime\n\nThis distinction is frequently asked in interviews:\n\n- Runtime — executes applications.\n- SDK — includes development tools and is used to build applications.\n\nYou can check installed versions with commands such as:\n\n```bash\ndotnet --list-sdks\ndotnet --list-runtimes\n```\n\n## Key points\n\n- The SDK supplies build and development tools.\n- `restore` resolves dependencies, `build` compiles, `test` runs tests and `publish` prepares deployment output.\n- NuGet manages external .NET packages.\n- A `.csproj` describes a project and its build dependencies.\n- Assemblies are compiled .NET units; namespaces only organize names."
+    },
+    {
+      "technologyName": "ASP.NET Core",
+      "name": "Middleware and Routing",
+      "content": "## The HTTP request pipeline\n\nASP.NET Core processes requests through a pipeline of **middleware** components. Each middleware can inspect or modify the request and response and can decide whether to invoke the next component.\n\nA simplified application pipeline might look like:\n\n```csharp\napp.UseHttpsRedirection();\n\napp.UseCors(\"AllowAngularClient\");\n\napp.UseAuthentication();\napp.UseAuthorization();\n\napp.MapControllers();\n```\n\nA request enters the pipeline from the top. Components that call the next delegate allow processing to continue. The response then flows back through components that performed work around the next call.\n\n## What middleware does\n\nMiddleware is used for cross-cutting HTTP concerns such as:\n\n- exception handling;\n- HTTPS redirection;\n- static files;\n- CORS;\n- authentication;\n- authorization;\n- request logging;\n- session state.\n\nCustom middleware can also be created when an application needs its own reusable request/response behavior.\n\n## Short-circuiting\n\nMiddleware does not always have to call the next component. If it produces the final response itself, the pipeline is **short-circuited**.\n\nStatic-file middleware is a typical example: when it finds a requested static file, it can return the file without passing the request to later endpoint-processing components.\n\n## Why middleware order matters\n\nMiddleware runs in registration order for the incoming request, so order can affect security and behavior.\n\nFor example, authentication should establish the user's identity before authorization evaluates whether that user may access a protected endpoint.\n\nCORS middleware must also be placed correctly so responses receive the appropriate cross-origin headers.\n\nThe exact recommended pipeline depends on which middleware an application uses, but the important interview idea is that **middleware order is significant**.\n\n## Routing\n\nRouting matches an incoming request to an application endpoint.\n\nController-based APIs commonly use attribute routes:\n\n```csharp\n[ApiController]\n[Route(\"api/[controller]\")]\npublic class TopicsController : ControllerBase\n{\n    [HttpGet(\"{id}\")]\n    public IActionResult GetById(int id)\n    {\n        ...\n    }\n}\n```\n\nA request such as:\n\n```text\nGET /api/Topics/5\n```\n\ncan match the `GetById` action and bind `5` to the `id` parameter.\n\n## Controller endpoint mapping\n\nIn a controller-based API, services are commonly registered with:\n\n```csharp\nbuilder.Services.AddControllers();\n```\n\nand controller routes are made available with:\n\n```csharp\napp.MapControllers();\n```\n\n`MapControllers()` adds endpoints for controller actions that use routing metadata.\n\n## Route parameters, query parameters and model binding\n\nASP.NET Core model binding maps request data to action parameters and request models.\n\nExamples:\n\n```csharp\n[HttpGet(\"{id}\")]\npublic IActionResult Get(int id)\n```\n\nHere `id` comes from the route.\n\n```csharp\n[HttpGet]\npublic IActionResult Search(string? status)\n```\n\nHere `status` can come from the query string:\n\n```text\n/api/Applications?status=Applied\n```\n\nComplex request objects for POST and PUT actions are commonly read from the request body.\n\n## Key points\n\n- Middleware forms the HTTP request pipeline.\n- A middleware may call the next component or short-circuit the request.\n- Registration order can change behavior and security.\n- Routing selects an endpoint based on route metadata.\n- `MapControllers()` exposes controller action endpoints.\n- Model binding maps route, query and body data to action parameters/models."
+    },
+    {
+      "technologyName": "ASP.NET Core",
+      "name": "Dependency Injection and Web APIs",
+      "content": "## Dependency injection\n\nASP.NET Core includes a built-in dependency injection container. Instead of a class constructing all of its own dependencies, dependencies are registered with the application and requested where needed.\n\n```csharp\nbuilder.Services.AddScoped<JwtService>();\n```\n\nA controller can receive a dependency through its constructor:\n\n```csharp\npublic class AuthController : ControllerBase\n{\n    private readonly JwtService _jwtService;\n\n    public AuthController(JwtService jwtService)\n    {\n        _jwtService = jwtService;\n    }\n}\n```\n\nThis reduces tight coupling and makes classes easier to test.\n\n## Service lifetimes\n\nThree important lifetimes are:\n\n### Transient\n\nA transient service is created each time it is requested.\n\n```csharp\nbuilder.Services.AddTransient<MyService>();\n```\n\n### Scoped\n\nIn a typical ASP.NET Core web application, a scoped service is created once per request scope.\n\n```csharp\nbuilder.Services.AddScoped<MyService>();\n```\n\n`DbContext` is commonly registered as scoped because one context per request is a useful default pattern.\n\n### Singleton\n\nA singleton service has one instance for the lifetime of the application service provider.\n\n```csharp\nbuilder.Services.AddSingleton<MyService>();\n```\n\nA singleton must be designed carefully because it is shared across requests and must not directly depend on shorter-lived scoped state in an invalid way.\n\n## API controllers\n\nA Web API controller commonly derives from `ControllerBase` and uses `[ApiController]`.\n\n```csharp\n[ApiController]\n[Route(\"api/[controller]\")]\npublic class TechnologiesController : ControllerBase\n{\n}\n```\n\n`[ApiController]` enables API-focused behavior, including automatic HTTP 400 responses for model-validation errors in normal controller usage.\n\n## DTOs\n\nDTOs (Data Transfer Objects) define the data accepted or returned by an API without exposing persistence entities directly.\n\n```csharp\npublic class LoginRequest\n{\n    [Required]\n    public string Email { get; set; } = string.Empty;\n\n    [Required]\n    public string Password { get; set; } = string.Empty;\n}\n```\n\nDTOs are useful because API contracts and database entities often have different responsibilities.\n\n## Action results and status codes\n\nAn API endpoint should communicate the outcome through suitable HTTP status codes.\n\nCommon controller helpers include:\n\n- `Ok(...)` — 200;\n- `Created(...)` / `CreatedAtAction(...)` — 201;\n- `BadRequest(...)` — 400;\n- `Unauthorized()` — 401;\n- `Forbid()` — 403;\n- `NotFound(...)` — 404.\n\n`IActionResult` is useful when an action can return different response types or status codes. `ActionResult<T>` can combine a typed success response with other HTTP results.\n\n## Authentication and authorization\n\n**Authentication** answers: *Who is the user?*\n\n**Authorization** answers: *What is that user allowed to do?*\n\nWith JWT bearer authentication, the client sends a token in the `Authorization` header:\n\n```text\nAuthorization: Bearer <token>\n```\n\nAfter token validation, claims can represent information such as a user ID or role.\n\nAn endpoint can require authentication:\n\n```csharp\n[Authorize]\n```\n\nor a role:\n\n```csharp\n[Authorize(Roles = \"Admin\")]\n```\n\n## Asynchronous API work\n\nDatabase and network operations are naturally asynchronous. ASP.NET Core actions commonly return `Task<IActionResult>` and use `await` with EF Core operations such as `ToListAsync()` or `SaveChangesAsync()`.\n\nThe purpose is not to make a database query execute faster. It allows the server thread to avoid blocking while waiting for I/O.\n\n## Key points\n\n- DI separates a class from the construction of its dependencies.\n- Transient means each resolution; scoped usually means once per request; singleton means one shared instance.\n- DTOs define API contracts.\n- Authentication establishes identity; authorization evaluates permissions.\n- HTTP status codes are part of the API contract.\n- Asynchronous I/O improves server resource usage while operations are waiting."
+    },
+    {
+      "technologyName": "Angular",
+      "name": "Components and Templates",
+      "content": "## Components\n\nAn Angular application is built from components. A component combines:\n\n- a TypeScript class that contains behavior and state;\n- an HTML template that describes what is rendered;\n- a selector that identifies the component;\n- optional styles;\n- component metadata supplied through `@Component`.\n\nA standalone component can declare the Angular features and other components it uses through its `imports` array.\n\n```ts\n@Component({\n  selector: 'app-profile',\n  imports: [],\n  templateUrl: './profile.html',\n  styleUrl: './profile.scss'\n})\nexport class Profile {\n  name = 'Ana';\n}\n```\n\n## Templates\n\nA template is HTML enhanced with Angular template syntax. It can display component data, react to events and conditionally or repeatedly render content.\n\nAngular keeps bindings updated as component state changes.\n\n## Interpolation\n\nInterpolation displays the result of an expression as text.\n\n```html\n<h2>{{ name }}</h2>\n```\n\nThe expression inside `{{ }}` is evaluated against the component/template context.\n\n## Property binding\n\nProperty binding sets a DOM or component property from an Angular expression.\n\n```html\n<button [disabled]=\"isSaving\">\n  Save\n</button>\n```\n\nSquare brackets indicate that Angular evaluates `isSaving` instead of treating it as the literal string `\"isSaving\"`.\n\n## Event binding\n\nParentheses are used to listen for an event:\n\n```html\n<button (click)=\"save()\">\n  Save\n</button>\n```\n\nWhen the click event occurs, Angular evaluates the specified handler expression.\n\n## Two-way binding\n\nThe `[(...)]` syntax combines input and output binding. A common forms example is:\n\n```html\n<input [(ngModel)]=\"email\">\n```\n\nFor `ngModel` in a standalone component, `FormsModule` must be imported by that component.\n\nThe syntax is often informally called **banana in a box** because it combines parentheses and square brackets.\n\n## Built-in control flow\n\nModern Angular templates support built-in control-flow blocks such as `@if` and `@for`.\n\n```html\n@if (users.length === 0) {\n  <p>No users.</p>\n} @else {\n  @for (user of users; track user.id) {\n    <p>{{ user.name }}</p>\n  }\n}\n```\n\nThe `track` expression lets Angular associate rendered views with data items efficiently.\n\n## Inputs and outputs\n\nComponents often communicate through inputs and outputs. Conceptually:\n\n- an input receives data from a parent;\n- an output notifies a parent about an event.\n\nThis keeps components reusable and avoids reaching directly into another component's internal state.\n\n## Key points\n\n- A component joins a TypeScript class, template and metadata.\n- `{{ value }}` is interpolation.\n- `[property]` is property binding.\n- `(event)` is event binding.\n- `[(...)]` represents two-way binding.\n- `@if` and `@for` provide template control flow."
+    },
+    {
+      "technologyName": "Angular",
+      "name": "Services, Forms and Routing",
+      "content": "## Services\n\nAn Angular service is typically a class that contains logic or state that should not live directly in a presentation component.\n\nCommon examples include:\n\n- HTTP API communication;\n- authentication/session helpers;\n- shared business logic;\n- reusable state.\n\nA service can be registered application-wide:\n\n```ts\n@Injectable({\n  providedIn: 'root'\n})\nexport class TopicsService {\n}\n```\n\n## Dependency injection\n\nAngular dependency injection supplies registered dependencies to classes that request them.\n\nConstructor injection is common:\n\n```ts\nconstructor(\n  private topicsService: TopicsService\n) {}\n```\n\nAngular also supports the `inject()` function:\n\n```ts\nprivate topicsService = inject(TopicsService);\n```\n\nBoth approaches remove the need for a component to manually construct the service.\n\n## HTTP and Observables\n\nAngular's `HttpClient` is used to make HTTP requests.\n\n```ts\ngetAll(): Observable<Topic[]> {\n  return this.http.get<Topic[]>(\n    'http://localhost:5254/api/Topics'\n  );\n}\n```\n\nHTTP methods return RxJS `Observable` values. A component can subscribe:\n\n```ts\nthis.topicsService.getAll().subscribe({\n  next: data => this.topics = data,\n  error: error => console.error(error)\n});\n```\n\nA subscription receives the asynchronous response when it arrives.\n\n## Forms\n\nAngular supports template-driven and reactive forms.\n\nTemplate-driven forms commonly use `[(ngModel)]`:\n\n```html\n<input\n  [(ngModel)]=\"email\"\n  name=\"email\">\n```\n\nA standalone component using `ngModel` imports `FormsModule`.\n\nReactive forms use objects such as `FormControl` and `FormGroup` and are useful for more explicit form models and complex validation.\n\n## Routing\n\nAngular Router maps URL paths to components.\n\n```ts\n{\n  path: 'tests/:id',\n  component: TakeTest\n}\n```\n\nThe `:id` segment is a route parameter. A component can read it with `ActivatedRoute`.\n\nNavigation can be performed in a template with `routerLink` or programmatically with `Router.navigate()`.\n\n## Route guards\n\nA guard controls whether navigation to a route is allowed.\n\nTypical examples include:\n\n- requiring authentication;\n- preventing an authenticated user from returning to Login;\n- restricting Admin pages to users with the Admin role;\n- preventing Admin accounts from entering User-only pages.\n\nA functional guard can use injected services:\n\n```ts\nexport const adminGuard: CanActivateFn = () => {\n  const auth = inject(Auth);\n  const router = inject(Router);\n\n  return auth.isAdmin()\n    ? true\n    : router.createUrlTree(['/applications']);\n};\n```\n\nA guard protects client-side navigation, but the backend must still enforce authorization because client code can be bypassed.\n\n## Key points\n\n- Services hold reusable logic such as API calls.\n- Dependency injection supplies service instances.\n- `HttpClient` returns Observables.\n- `ngModel` is used by template-driven forms and requires `FormsModule`.\n- Router paths can contain parameters.\n- Guards control navigation, while backend authorization remains the real security boundary."
+    },
+    {
+      "technologyName": "Node.js",
+      "name": "Runtime and Asynchronous I/O",
+      "content": "## What is Node.js?\n\nNode.js is a JavaScript runtime that executes JavaScript outside the browser. It is widely used for servers, command-line tools and development tooling.\n\nNode.js uses the V8 JavaScript engine and provides platform APIs for files, networking, processes and other operating-system capabilities.\n\n## Event-driven execution\n\nNode.js is strongly associated with event-driven programming. JavaScript callbacks are executed by the event loop, which coordinates application work and asynchronous events.\n\nA server can handle many connections efficiently when each callback performs a small amount of work and long-running I/O is handled asynchronously.\n\n## Non-blocking I/O\n\nConsider reading a file asynchronously:\n\n```js\nimport { readFile } from 'node:fs';\n\nreadFile('data.txt', 'utf8', (error, data) => {\n  if (error) {\n    console.error(error);\n    return;\n  }\n\n  console.log(data);\n});\n\nconsole.log('This can run before the file callback.');\n```\n\nThe application does not need to block the JavaScript execution path waiting for the entire file operation to complete before other work can continue.\n\n## Event loop and worker pool\n\nA useful interview simplification is:\n\n- the **event loop** executes JavaScript callbacks and orchestrates non-blocking work;\n- a **worker pool** is used by Node.js for certain operations that would otherwise be expensive to perform on the event-loop thread.\n\nNot every asynchronous operation works in exactly the same way internally, so the important principle is to avoid blocking the event loop with long synchronous work.\n\n## CPU-bound work\n\nAsynchronous syntax does not magically make heavy CPU computation non-blocking.\n\n```js\nasync function calculate() {\n  // A huge synchronous loop here still occupies the JS thread.\n}\n```\n\n`async`/`await` makes asynchronous control flow easier to write, but CPU-heavy JavaScript can still block other callbacks.\n\nFor genuinely CPU-intensive parallel work, Node.js provides worker threads and other architectural options.\n\n## Promises and `async`/`await`\n\nPromise-based APIs can be consumed with `await`.\n\n```js\nimport { readFile } from 'node:fs/promises';\n\nasync function loadFile() {\n  const data = await readFile(\n    'data.txt',\n    'utf8'\n  );\n\n  console.log(data);\n}\n```\n\n`await` pauses that async function until the promise settles without turning the waiting I/O into a synchronous blocking call.\n\n## The `process` object\n\nNode.js provides runtime information through the global `process` object.\n\nEnvironment variables are commonly read from:\n\n```js\nconst port = process.env.PORT;\n```\n\nEnvironment variables are often used for deployment-specific configuration such as database connection strings, API URLs and secrets.\n\n## Key points\n\n- Node.js runs JavaScript outside the browser.\n- The event loop executes callbacks and coordinates asynchronous work.\n- Non-blocking I/O lets the application continue handling other work while waiting.\n- Long CPU-bound JavaScript can block the event loop.\n- `async`/`await` improves asynchronous code structure but does not make synchronous CPU work free.\n- Environment variables are available through `process.env`."
+    },
+    {
+      "technologyName": "Node.js",
+      "name": "Modules and Packages",
+      "content": "## Why modules exist\n\nModules divide an application into reusable units with explicit dependencies and exports. Node.js supports two major module systems: **CommonJS** and **ECMAScript Modules (ESM)**.\n\n## CommonJS\n\nCommonJS is Node.js's original module format.\n\n```js\n// math.cjs\nfunction add(a, b) {\n  return a + b;\n}\n\nmodule.exports = {\n  add\n};\n```\n\nIt can be loaded with `require()`:\n\n```js\nconst { add } = require('./math.cjs');\nconsole.log(add(2, 3));\n```\n\n`module.exports` represents the value exported by a CommonJS module.\n\n## ECMAScript Modules\n\nESM is the standard JavaScript module system and uses `import` and `export`.\n\n```js\n// math.js\nexport function add(a, b) {\n  return a + b;\n}\n```\n\n```js\nimport { add } from './math.js';\n```\n\nNode.js can explicitly identify ESM through mechanisms such as:\n\n- `.mjs` files;\n- `\"type\": \"module\"` in the nearest `package.json`.\n\nA `.cjs` file explicitly represents CommonJS.\n\n## `package.json`\n\nA package is described by a `package.json` file. Common fields include:\n\n```json\n{\n  \"name\": \"jobtrack-server\",\n  \"version\": \"1.0.0\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"start\": \"node server.js\"\n  },\n  \"dependencies\": {\n    \"express\": \"^5.0.0\"\n  }\n}\n```\n\nImportant responsibilities include:\n\n- package name and version;\n- dependency declarations;\n- scripts;\n- module-type configuration;\n- package entry/export metadata.\n\n## npm\n\nnpm is commonly used to install and manage JavaScript packages and to run scripts declared in `package.json`.\n\n```bash\nnpm install express\nnpm run start\n```\n\nA regular dependency is normally listed in `dependencies`. Development-only tooling can be listed in `devDependencies`.\n\n## `package-lock.json`\n\nnpm commonly creates `package-lock.json` to record a resolved dependency tree. This improves repeatability because installs can use the exact resolved package versions and integrity information recorded in the lockfile.\n\nThe lockfile should normally be committed for an application project.\n\n## Built-in modules\n\nNode.js also provides built-in modules such as:\n\n```js\nimport fs from 'node:fs';\nimport path from 'node:path';\n```\n\nThe `node:` prefix clearly identifies a built-in Node.js module.\n\n## CommonJS and ESM interoperability\n\nNode.js provides interoperability between CommonJS and ESM, but they are not identical module systems. Their syntax, resolution behavior and available globals differ.\n\nFor interview-level understanding, know which syntax belongs to which system and how the package `\"type\"` field influences `.js` interpretation.\n\n## Key points\n\n- CommonJS uses `require()` and `module.exports`.\n- ESM uses `import` and `export`.\n- `\"type\": \"module\"` makes `.js` files in that package use ESM semantics.\n- `package.json` describes package metadata, scripts and dependencies.\n- npm manages packages.\n- `package-lock.json` records resolved dependency information for repeatable installs."
+    },
+    {
+      "technologyName": "Docker",
+      "name": "Images and Containers",
+      "content": "## Docker images\n\nA Docker image is a packaged filesystem and metadata used as the basis for containers. Images are normally built from Dockerfile instructions.\n\nImages are made of layers. Many Dockerfile instructions create filesystem layers that can be cached and reused between builds.\n\nAn image itself is treated as an immutable template: when a container starts, Docker adds a writable container layer rather than changing the underlying image.\n\n## Containers\n\nA container is a running or stopped instance created from an image.\n\n```bash\ndocker run nginx\n```\n\nConceptually:\n\n```text\nDockerfile\n    ↓ docker build\nImage\n    ↓ docker run\nContainer\n```\n\nMultiple containers can be created from the same image, and each container has its own runtime state.\n\n## Container isolation\n\nContainers isolate application processes and filesystem/network configuration while sharing the host operating-system kernel.\n\nThis differs from a traditional virtual machine, which normally includes a full guest operating system and its own kernel.\n\nThat is one reason containers can start quickly and use fewer resources than full VMs for many workloads.\n\n## Container lifecycle\n\nUseful commands include:\n\n```bash\ndocker ps\ndocker ps -a\ndocker stop <container>\ndocker start <container>\ndocker rm <container>\n```\n\nRemoving a container does not automatically remove the image it was created from.\n\nSimilarly, removing an image does not describe application data persistence. Persistent data should be designed using volumes or external storage rather than relying on a container's writable layer.\n\n## Image names and tags\n\nImages can have repository names and tags:\n\n```text\njobtrack-api:1.0\npostgres:18\n```\n\nA tag identifies a particular named image reference. `latest` is just a conventional tag; it does not inherently mean \"newest available version\" unless the publisher keeps it that way.\n\n## Registries\n\nA registry stores and distributes images. Docker Hub is a public registry, while organizations can also operate private registries.\n\nTypical flow:\n\n```text\nbuild image\n    ↓\ntag image\n    ↓\npush to registry\n    ↓\npull on another environment\n```\n\n## Images versus containers\n\nA frequent interview question is the difference:\n\n- **Image** — reusable template/package.\n- **Container** — runtime instance of an image.\n\nChanges made only inside a container's writable layer are tied to that container and should not be treated as reliable persistent application storage.\n\n## Key points\n\n- Images are reusable templates made from layers.\n- Containers are instances created from images.\n- Containers share the host kernel rather than booting a full guest OS.\n- One image can create many containers.\n- Registries distribute images.\n- Persistent data should not depend only on a container's writable layer."
+    },
+    {
+      "technologyName": "Docker",
+      "name": "Dockerfile, Ports and Volumes",
+      "content": "## Dockerfiles\n\nA Dockerfile is a text file containing instructions for building an image.\n\nExample:\n\n```dockerfile\nFROM mcr.microsoft.com/dotnet/aspnet:9.0\nWORKDIR /app\nCOPY . .\nEXPOSE 8080\nENTRYPOINT [\"dotnet\", \"JobTrack.Api.dll\"]\n```\n\n## Common instructions\n\n### `FROM`\n\nSelects the base image and starts a build stage.\n\n```dockerfile\nFROM node:22\n```\n\n### `WORKDIR`\n\nSets the working directory for later instructions and for the container command when applicable.\n\n### `COPY`\n\nCopies files from the build context into the image.\n\n### `RUN`\n\nExecutes a command **during image build** and usually contributes to a new image layer.\n\n```dockerfile\nRUN npm ci\n```\n\n### `CMD` and `ENTRYPOINT`\n\nThese describe the command/process associated with starting a container from the image. They have different override/composition behavior, but the important distinction from `RUN` is that `RUN` is a build-time instruction, while `CMD`/`ENTRYPOINT` participate in runtime startup.\n\n## Build cache\n\nDocker can reuse unchanged build layers. Dockerfile ordering therefore matters for efficient builds.\n\nFor example, dependency metadata can be copied and dependencies installed before copying frequently changing source code. That can allow dependency layers to remain cached when only source code changes.\n\n## `EXPOSE` is not port publishing\n\nThis is an important interview point.\n\n```dockerfile\nEXPOSE 8080\n```\n\ndocuments that the container is intended to listen on that port. It does **not** publish the port to the host by itself.\n\nPort publishing is performed when the container runs:\n\n```bash\ndocker run -p 5000:8080 jobtrack-api\n```\n\nThis maps host port `5000` to container port `8080`.\n\n## Volumes\n\nA Docker volume provides persistent storage managed by Docker.\n\n```bash\ndocker run \\\n  -v postgres_data:/var/lib/postgresql/data \\\n  postgres\n```\n\nThe volume can survive removal and recreation of a container.\n\n## Bind mounts\n\nA bind mount maps a specific host path into a container.\n\nThey are useful in development when the container should directly see host files, but they couple the container to a host filesystem location.\n\nA simplified distinction:\n\n- Volume — Docker-managed persistent storage.\n- Bind mount — direct host path mounted into the container.\n\n## Environment configuration\n\nEnvironment variables can be supplied to containers:\n\n```bash\ndocker run \\\n  -e ASPNETCORE_ENVIRONMENT=Production \\\n  jobtrack-api\n```\n\nSecrets require careful handling; putting sensitive values directly into a Dockerfile can permanently store them in image history/layers.\n\n## Key points\n\n- `FROM` selects a base image.\n- `RUN` executes while building the image.\n- `CMD`/`ENTRYPOINT` describe container startup behavior.\n- `EXPOSE` documents a listening port but does not publish it.\n- `-p host:container` publishes/maps a port.\n- Volumes are designed for persistent Docker-managed data."
+    },
+    {
+      "technologyName": "SQL",
+      "name": "Queries and Aggregation",
+      "content": "## The basic `SELECT` query\n\nA `SELECT` statement retrieves rows and expressions from a data source.\n\n```sql\nSELECT id, company_name, status\nFROM job_applications;\n```\n\nThe select list controls which columns or expressions appear in the result.\n\n## Filtering with `WHERE`\n\n`WHERE` removes individual rows that do not satisfy a condition.\n\n```sql\nSELECT *\nFROM job_applications\nWHERE status = 'Applied';\n```\n\nSQL uses three-valued logic because expressions can involve `NULL`. To test nullness, use `IS NULL` or `IS NOT NULL`, not `= NULL`.\n\n```sql\nWHERE notes IS NULL\n```\n\n## Sorting and limiting\n\n`ORDER BY` controls result ordering.\n\n```sql\nSELECT *\nFROM interviews\nORDER BY interview_date ASC;\n```\n\nWithout `ORDER BY`, applications should not rely on rows being returned in a particular order.\n\nMany database systems provide result limiting. PostgreSQL supports `LIMIT`:\n\n```sql\nSELECT *\nFROM interviews\nORDER BY interview_date\nLIMIT 5;\n```\n\n## `DISTINCT`\n\n`DISTINCT` removes duplicate result rows.\n\n```sql\nSELECT DISTINCT status\nFROM job_applications;\n```\n\nIt applies to the selected result values, not to some hidden row identity.\n\n## Aggregate functions\n\nAggregate functions calculate a value over multiple rows.\n\nCommon examples:\n\n```sql\nCOUNT(*)\nSUM(amount)\nAVG(score)\nMIN(score)\nMAX(score)\n```\n\n`COUNT(*)` counts input rows.\n\n`COUNT(column)` counts rows where that expression is not `NULL`.\n\nThis difference is important.\n\n## `GROUP BY`\n\n`GROUP BY` forms groups of rows that share the same grouping values.\n\n```sql\nSELECT status, COUNT(*)\nFROM job_applications\nGROUP BY status;\n```\n\nEach output row now represents a status group rather than one original application row.\n\nColumns selected alongside aggregates generally need to be grouped unless the database can prove an allowed functional dependency.\n\n## `HAVING`\n\n`HAVING` filters groups after grouping and aggregation.\n\n```sql\nSELECT technology_id, AVG(percentage)\nFROM test_attempts\nGROUP BY technology_id\nHAVING AVG(percentage) >= 70;\n```\n\nThe key distinction is:\n\n- `WHERE` filters source rows before grouping.\n- `HAVING` filters grouped results.\n\n## Conceptual query processing\n\nA useful conceptual order is:\n\n```text\nFROM / JOIN\nWHERE\nGROUP BY\nHAVING\nSELECT\nORDER BY\nLIMIT\n```\n\nDatabase optimizers are free to implement an equivalent query efficiently, so this is a logical reasoning model rather than a promise about physical execution steps.\n\n## Key points\n\n- `WHERE` filters rows.\n- `GROUP BY` forms groups.\n- `HAVING` filters groups.\n- `COUNT(*)` counts rows; `COUNT(column)` ignores null values for that expression.\n- `ORDER BY` is required when a specific result order matters.\n- `IS NULL` is the proper null test."
+    },
+    {
+      "technologyName": "SQL",
+      "name": "Joins, Keys and Transactions",
+      "content": "## Why joins exist\n\nRelational databases split related data into tables. A `JOIN` combines related rows according to a join condition.\n\nImagine:\n\n```text\nJobApplications\n- Id\n- CompanyName\n\nInterviews\n- Id\n- JobApplicationId\n- InterviewDate\n```\n\n`Interviews.JobApplicationId` can reference the application to which an interview belongs.\n\n## `INNER JOIN`\n\nAn inner join returns matching combinations from both sides.\n\n```sql\nSELECT\n    a.company_name,\n    i.interview_date\nFROM job_applications a\nINNER JOIN interviews i\n    ON i.job_application_id = a.id;\n```\n\nApplications with no matching interview are not returned by this join.\n\n## `LEFT JOIN`\n\nA left join keeps every row from the left side. When no matching right-side row exists, right-side columns contain `NULL`.\n\n```sql\nSELECT\n    a.company_name,\n    i.interview_date\nFROM job_applications a\nLEFT JOIN interviews i\n    ON i.job_application_id = a.id;\n```\n\nThis is useful when you want all applications, including applications with no interview yet.\n\n## Keys\n\nA **primary key** identifies a row uniquely. A primary key is both unique and non-null.\n\nA **foreign key** requires referencing values to correspond to valid referenced rows, maintaining referential integrity.\n\nA key can contain more than one column. A combination such as:\n\n```sql\nPRIMARY KEY (job_application_id, technology_id)\n```\n\nis a **composite primary key** and is commonly useful for join tables.\n\n## Many-to-many relationships\n\nA many-to-many relationship is usually represented with a linking table.\n\n```text\nJobApplications\n        ↓\nJobApplicationTechnologies\n        ↑\nTechnologies\n```\n\nThe linking table contains foreign keys to both parent tables and may use the pair as a composite primary key.\n\n## Transactions\n\nA transaction groups database operations into one logical unit.\n\n```sql\nBEGIN;\n\nUPDATE accounts\nSET balance = balance - 100\nWHERE id = 1;\n\nUPDATE accounts\nSET balance = balance + 100\nWHERE id = 2;\n\nCOMMIT;\n```\n\nIf an error occurs before completion, the transaction can be rolled back:\n\n```sql\nROLLBACK;\n```\n\nThe goal is to prevent a multi-step operation from leaving the database in a partially completed state.\n\n## ACID properties\n\nTransactions are often discussed through ACID:\n\n- **Atomicity** — a transaction's work succeeds as a unit or is rolled back.\n- **Consistency** — valid database rules should remain satisfied across successful transactions.\n- **Isolation** — concurrent transactions should have controlled interaction according to an isolation level.\n- **Durability** — committed changes should survive failures covered by the database's durability guarantees.\n\nIsolation levels balance concurrency against which concurrent anomalies are permitted.\n\n## Key points\n\n- `INNER JOIN` requires a match.\n- `LEFT JOIN` keeps all left-side rows.\n- Primary keys uniquely identify rows.\n- Foreign keys enforce referential integrity.\n- Composite keys use multiple columns.\n- Transactions group operations so they can be committed or rolled back as a unit."
+    },
+    {
+      "technologyName": "PostgreSQL",
+      "name": "PostgreSQL Features",
+      "content": "## PostgreSQL and SQL\n\nPostgreSQL is a relational database management system with strong SQL support plus PostgreSQL-specific features and data types.\n\nIt supports standard relational concepts such as tables, keys, joins and transactions while adding features that are useful for application development.\n\n## `RETURNING`\n\nPostgreSQL data-modification statements can return affected row values directly.\n\n```sql\nINSERT INTO technologies (name)\nVALUES ('Angular')\nRETURNING id, name;\n```\n\nThis avoids having to issue a separate query just to retrieve generated values.\n\n`RETURNING` can also be used with `UPDATE` and `DELETE`.\n\n## Identity columns\n\nPostgreSQL supports SQL identity columns for automatically generated values.\n\n```sql\nCREATE TABLE users (\n    id integer\n        GENERATED BY DEFAULT AS IDENTITY\n        PRIMARY KEY,\n    email text NOT NULL\n);\n```\n\nIdentity columns are a modern SQL-standard mechanism for generated numeric identifiers.\n\n## `ILIKE`\n\nPostgreSQL provides `ILIKE` for case-insensitive pattern matching.\n\n```sql\nSELECT *\nFROM job_applications\nWHERE company_name ILIKE '%soft%';\n```\n\n`LIKE` and `ILIKE` use pattern characters such as `%` and `_`.\n\n## JSON and JSONB\n\nPostgreSQL supports `json` and `jsonb`.\n\nBoth can represent JSON data, but `jsonb` stores a decomposed binary representation that is generally more convenient for processing and supports useful indexing strategies.\n\nExample:\n\n```sql\nCREATE TABLE events (\n    id bigint\n        GENERATED BY DEFAULT AS IDENTITY\n        PRIMARY KEY,\n    payload jsonb NOT NULL\n);\n```\n\nJSONB is useful when part of the application's data has flexible JSON structure, but it should not automatically replace normal relational modeling for strongly related entities.\n\n## `ON CONFLICT`\n\n`INSERT ... ON CONFLICT` provides conflict handling for inserts.\n\n```sql\nINSERT INTO technologies (name)\nVALUES ('Angular')\nON CONFLICT (name)\nDO NOTHING;\n```\n\nIt can also update an existing row:\n\n```sql\nINSERT INTO counters (key, value)\nVALUES ('visits', 1)\nON CONFLICT (key)\nDO UPDATE\nSET value = counters.value + 1;\n```\n\nThis pattern is commonly called an **upsert**.\n\n## Common Table Expressions\n\nA `WITH` query defines one or more auxiliary query expressions for use by a larger statement.\n\n```sql\nWITH completed AS (\n    SELECT *\n    FROM test_attempts\n    WHERE completed_at IS NOT NULL\n)\nSELECT COUNT(*)\nFROM completed;\n```\n\nCTEs can make a complex query easier to structure. PostgreSQL also supports recursive CTEs for hierarchical/recursive query problems.\n\n## PostgreSQL data types\n\nPostgreSQL includes useful types beyond basic SQL scalar types, including:\n\n- `boolean`;\n- `uuid`;\n- arrays;\n- `json` / `jsonb`;\n- rich date/time types;\n- ranges and other specialized types.\n\nChoosing a type that accurately models the data improves validation and querying.\n\n## Key points\n\n- `RETURNING` returns affected values from data-modification statements.\n- Identity columns generate values using SQL identity syntax.\n- `ILIKE` performs case-insensitive pattern matching.\n- `jsonb` is designed for efficient JSON processing and indexing.\n- `ON CONFLICT` enables insert conflict handling/upsert patterns.\n- `WITH` defines common table expressions."
+    },
+    {
+      "technologyName": "PostgreSQL",
+      "name": "Indexes and Constraints",
+      "content": "## Constraints\n\nConstraints enforce rules directly in the database. They protect data even when multiple applications or clients write to the same tables.\n\n## `NOT NULL`\n\n`NOT NULL` prevents a column from containing a null value.\n\n```sql\nemail text NOT NULL\n```\n\n## `UNIQUE`\n\nA unique constraint requires constrained values to be unique according to PostgreSQL's uniqueness rules.\n\n```sql\nemail text UNIQUE\n```\n\nA table can have multiple unique constraints.\n\n## Primary keys\n\nA primary key identifies a row.\n\n```sql\nid integer PRIMARY KEY\n```\n\nA primary key requires uniqueness and non-null values. PostgreSQL automatically creates a unique B-tree index to enforce a primary key.\n\nA table has at most one declared primary key, though that key may contain multiple columns.\n\n## Foreign keys\n\nA foreign key requires values to match a referenced row.\n\n```sql\ntechnology_id integer\n    REFERENCES technologies(id)\n```\n\nThis maintains referential integrity.\n\nDelete/update behavior can be controlled with actions such as `CASCADE`, `RESTRICT`, `SET NULL` and others depending on the relationship's intended meaning.\n\n## `CHECK`\n\nA check constraint validates a boolean condition for inserted or updated data.\n\n```sql\nparticipants integer\n    CHECK (participants BETWEEN 3 AND 10)\n```\n\nThis is useful for rules that can be expressed using the row being validated.\n\n## Indexes\n\nAn index is a data structure that can help PostgreSQL find rows without scanning every row in a table.\n\n```sql\nCREATE INDEX\n    ix_applications_status\nON job_applications(status);\n```\n\nB-tree is PostgreSQL's default index method and is suitable for many equality and ordered comparison workloads.\n\nPostgreSQL also supports other index methods for specialized access patterns.\n\n## Index trade-offs\n\nIndexes are not free.\n\nAdvantages can include:\n\n- faster lookups;\n- faster join key access;\n- support for ordered retrieval in suitable cases.\n\nCosts include:\n\n- additional storage;\n- work during inserts, updates and deletes;\n- maintenance overhead.\n\nTherefore, \"add an index to every column\" is not a good strategy.\n\n## Composite indexes\n\nAn index can contain multiple columns:\n\n```sql\nCREATE INDEX\n    ix_attempt_user_test\nON test_attempts(user_id, test_id);\n```\n\nColumn order matters because it influences which query patterns can efficiently use the index.\n\n## `EXPLAIN`\n\nPostgreSQL's `EXPLAIN` command shows the query plan chosen by the optimizer.\n\n```sql\nEXPLAIN\nSELECT *\nFROM job_applications\nWHERE status = 'Applied';\n```\n\n`EXPLAIN ANALYZE` actually executes the statement and reports runtime measurements, so it should be used with awareness of the query's effects and cost.\n\n## Key points\n\n- Constraints protect data correctness.\n- Primary keys are unique and non-null.\n- Foreign keys maintain references between related tables.\n- `CHECK` enforces a row-level condition.\n- Indexes can improve reads but add storage and write cost.\n- B-tree is the default PostgreSQL index method.\n- `EXPLAIN` helps inspect query plans."
+    },
+    {
+      "technologyName": "Java",
+      "name": "OOP and Inheritance",
+      "content": "## Classes and objects\n\nJava is a class-based object-oriented language. A class defines fields and methods, while an object is an instance of a class.\n\n```java\npublic class User {\n    private String name;\n\n    public User(String name) {\n        this.name = name;\n    }\n\n    public String getName() {\n        return name;\n    }\n}\n```\n\nThe `private` field and public getter demonstrate encapsulation: callers use the class's public API instead of directly modifying internal state.\n\n## Inheritance\n\nA class can extend one direct superclass.\n\n```java\npublic class Animal {\n    public void speak() {\n        System.out.println(\"Animal sound\");\n    }\n}\n\npublic class Dog extends Animal {\n    @Override\n    public void speak() {\n        System.out.println(\"Woof\");\n    }\n}\n```\n\nThe subclass inherits accessible behavior from the superclass and can override instance methods.\n\nJava classes have single class inheritance: a class does not extend multiple classes.\n\n## `Object`\n\n`java.lang.Object` is the root of the Java class hierarchy.\n\nAll ordinary classes ultimately inherit methods originating from `Object`, including methods such as:\n\n- `toString()`;\n- `equals(Object)`;\n- `hashCode()`;\n- `getClass()`.\n\nCorrectly designed value-like classes often need consistent `equals()` and `hashCode()` implementations, especially when used in hash-based collections.\n\n## Method overriding\n\nAn overriding method provides a subclass implementation for an inherited overridable instance method.\n\n`@Override` is strongly recommended:\n\n```java\n@Override\npublic String toString() {\n    return name;\n}\n```\n\nIt lets the compiler verify that the method actually overrides a superclass/interface method as intended.\n\nThe `super` keyword can access superclass behavior:\n\n```java\n@Override\npublic void speak() {\n    super.speak();\n    System.out.println(\"Woof\");\n}\n```\n\n## Abstract classes\n\nAn abstract class cannot be instantiated directly.\n\n```java\npublic abstract class Shape {\n    public abstract double area();\n\n    public void printType() {\n        System.out.println(\"Shape\");\n    }\n}\n```\n\nAn abstract class may contain both abstract methods and implemented methods. A concrete subclass must implement inherited abstract methods unless it is also abstract.\n\n## `final`\n\n`final` has different meanings depending on context.\n\n- A `final` class cannot be subclassed.\n- A `final` method cannot be overridden.\n- A `final` variable cannot be assigned a new value after initialization rules are satisfied.\n\nA final object reference cannot be changed to refer to another object, but that does not automatically make the referenced object immutable.\n\n## Access and encapsulation\n\nImportant access levels include:\n\n- `public`;\n- `protected`;\n- package-private (no explicit modifier);\n- `private`.\n\nEncapsulation keeps implementation details hidden and exposes intentional operations through methods.\n\n## Key points\n\n- Java classes have one direct superclass.\n- `Object` is the root of the class hierarchy.\n- Overriding enables polymorphic behavior.\n- Abstract classes cannot be instantiated.\n- `final` can prevent inheritance or overriding.\n- `@Override` helps the compiler verify overriding intent."
+    },
+    {
+      "technologyName": "Java",
+      "name": "Interfaces and Collections",
+      "content": "## Interfaces\n\nA Java interface defines a contract that implementing classes agree to provide.\n\n```java\npublic interface NotificationService {\n    void send(String message);\n}\n```\n\nA class implements an interface with `implements`:\n\n```java\npublic class EmailNotificationService\n        implements NotificationService {\n\n    @Override\n    public void send(String message) {\n        System.out.println(message);\n    }\n}\n```\n\nA class can implement multiple interfaces even though it extends only one class.\n\nInterfaces can also contain features such as default and static methods under modern Java language rules.\n\n## Program to an interface\n\nUsing an interface as the variable type reduces coupling:\n\n```java\nNotificationService service =\n    new EmailNotificationService();\n```\n\nThe caller depends on the contract, not on all implementation details of `EmailNotificationService`.\n\nThe same idea is common in the Collections Framework.\n\n## Collections Framework\n\nThe framework provides interfaces and implementations for common data structures.\n\n### `List`\n\nA `List` is ordered and can contain duplicate values.\n\n```java\nList<String> technologies =\n    new ArrayList<>();\n\ntechnologies.add(\"Java\");\ntechnologies.add(\"SQL\");\ntechnologies.add(\"Java\");\n```\n\n### `Set`\n\nA `Set` does not contain duplicate elements according to its equality semantics.\n\n```java\nSet<String> technologies =\n    new HashSet<>();\n```\n\n### `Queue`\n\nA `Queue` models elements waiting to be processed according to a queue implementation's ordering rules.\n\n### `Map`\n\nA `Map<K,V>` associates keys with values.\n\n```java\nMap<String, Integer> scores =\n    new HashMap<>();\n\nscores.put(\"Java\", 90);\n```\n\n`Map` is part of the Java Collections Framework, but it is not a subtype of the `Collection` interface.\n\n## Common implementations\n\nFrequently encountered implementations include:\n\n- `ArrayList` for a resizable list;\n- `HashSet` for hash-based set membership;\n- `HashMap` for hash-based key/value lookup;\n- `ArrayDeque` for deque/queue operations.\n\nThe best implementation depends on required behavior and performance characteristics.\n\n## Generics\n\nGenerics provide compile-time type safety.\n\n```java\nList<String> names =\n    new ArrayList<>();\n```\n\nThe compiler knows the list contains `String` values, reducing casts and many type errors.\n\nUsing raw collection types such as plain `List` discards much of this type safety and is normally avoided in modern code.\n\n## Equality and hash-based collections\n\n`HashSet` and `HashMap` rely on `hashCode()` and `equals()` behavior for keys/elements.\n\nIf two objects are considered equal by `equals()`, their `hashCode()` implementations must be consistent with that equality contract.\n\nIncorrect equality/hash implementations can cause surprising behavior when custom objects are used as hash keys or set elements.\n\n## Key points\n\n- A class can implement multiple interfaces.\n- `List` is ordered and allows duplicates.\n- `Set` prevents duplicates according to equality semantics.\n- `Map` stores key/value pairs and is not itself a `Collection`.\n- Generics provide compile-time type safety.\n- Hash-based collections rely on consistent `equals()` and `hashCode()`."
+    }
+  ],
+  "questions": [
+    {
+      "code": "CS-01",
+      "technologyName": "C#",
+      "topicName": "Types and OOP",
+      "text": "Which statement correctly describes a C# value type?",
+      "answers": [
+        {
+          "text": "A variable of a value type contains the data directly.",
+          "isCorrect": true
+        },
+        {
+          "text": "A variable always stores a reference to an object on the managed heap.",
+          "isCorrect": false
+        },
+        {
+          "text": "Value types can only be declared with the class keyword.",
+          "isCorrect": false
+        },
+        {
+          "text": "Value types cannot be copied by assignment.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-02",
+      "technologyName": "C#",
+      "topicName": "Types and OOP",
+      "text": "Which of the following is a reference type in C#?",
+      "answers": [
+        {
+          "text": "class",
+          "isCorrect": true
+        },
+        {
+          "text": "struct",
+          "isCorrect": false
+        },
+        {
+          "text": "enum",
+          "isCorrect": false
+        },
+        {
+          "text": "int",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-03",
+      "technologyName": "C#",
+      "topicName": "Types and OOP",
+      "text": "What is the main purpose of an interface in C#?",
+      "answers": [
+        {
+          "text": "To define a contract that implementing types must satisfy.",
+          "isCorrect": true
+        },
+        {
+          "text": "To allocate objects on the stack.",
+          "isCorrect": false
+        },
+        {
+          "text": "To replace every class constructor.",
+          "isCorrect": false
+        },
+        {
+          "text": "To store only constant numeric values.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-04",
+      "technologyName": "C#",
+      "topicName": "Types and OOP",
+      "text": "Which keyword is used in a derived class to provide a new implementation of an inherited virtual method?",
+      "answers": [
+        {
+          "text": "override",
+          "isCorrect": true
+        },
+        {
+          "text": "extends",
+          "isCorrect": false
+        },
+        {
+          "text": "implements",
+          "isCorrect": false
+        },
+        {
+          "text": "sealed",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-05",
+      "technologyName": "C#",
+      "topicName": "Collections and Language Features",
+      "text": "What does LINQ Where typically do?",
+      "answers": [
+        {
+          "text": "Filters a sequence based on a predicate.",
+          "isCorrect": true
+        },
+        {
+          "text": "Transforms every item into a new shape.",
+          "isCorrect": false
+        },
+        {
+          "text": "Sorts a sequence in descending order only.",
+          "isCorrect": false
+        },
+        {
+          "text": "Creates a new database table.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-06",
+      "technologyName": "C#",
+      "topicName": "Collections and Language Features",
+      "text": "Which generic collection is designed as an ordered list of elements and can contain duplicates?",
+      "answers": [
+        {
+          "text": "List<T>",
+          "isCorrect": true
+        },
+        {
+          "text": "HashSet<T>",
+          "isCorrect": false
+        },
+        {
+          "text": "Dictionary<TKey, TValue>",
+          "isCorrect": false
+        },
+        {
+          "text": "Queue<T> only when all values are unique",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-07",
+      "technologyName": "C#",
+      "topicName": "Collections and Language Features",
+      "text": "What is the purpose of a finally block in exception handling?",
+      "answers": [
+        {
+          "text": "To run cleanup code when control leaves the try/catch construct under normal exception-handling flow.",
+          "isCorrect": true
+        },
+        {
+          "text": "To catch only compile-time errors.",
+          "isCorrect": false
+        },
+        {
+          "text": "To prevent all exceptions from being thrown.",
+          "isCorrect": false
+        },
+        {
+          "text": "To define a custom exception type.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-08",
+      "technologyName": "C#",
+      "topicName": "Collections and Language Features",
+      "text": "What does the sealed modifier on a class prevent?",
+      "answers": [
+        {
+          "text": "The class from being inherited.",
+          "isCorrect": true
+        },
+        {
+          "text": "The class from having methods.",
+          "isCorrect": false
+        },
+        {
+          "text": "Objects of the class from being created.",
+          "isCorrect": false
+        },
+        {
+          "text": "The class from implementing interfaces.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-01",
+      "technologyName": ".NET",
+      "topicName": ".NET Platform and Runtime",
+      "text": "What is the primary role of the .NET runtime?",
+      "answers": [
+        {
+          "text": "To execute managed .NET applications and provide runtime services.",
+          "isCorrect": true
+        },
+        {
+          "text": "To edit C# source code.",
+          "isCorrect": false
+        },
+        {
+          "text": "To replace the operating system kernel.",
+          "isCorrect": false
+        },
+        {
+          "text": "To store relational database tables.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-02",
+      "technologyName": ".NET",
+      "topicName": ".NET Platform and Runtime",
+      "text": "What does the .NET garbage collector primarily manage?",
+      "answers": [
+        {
+          "text": "Automatic memory reclamation for managed objects that are no longer reachable.",
+          "isCorrect": true
+        },
+        {
+          "text": "Compilation of HTML templates.",
+          "isCorrect": false
+        },
+        {
+          "text": "Database transaction rollback.",
+          "isCorrect": false
+        },
+        {
+          "text": "HTTP routing rules.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-03",
+      "technologyName": ".NET",
+      "topicName": ".NET Platform and Runtime",
+      "text": "What does a target framework such as net9.0 indicate in a project?",
+      "answers": [
+        {
+          "text": "The .NET framework version/API surface the project targets.",
+          "isCorrect": true
+        },
+        {
+          "text": "The name of the project database.",
+          "isCorrect": false
+        },
+        {
+          "text": "The operating system username.",
+          "isCorrect": false
+        },
+        {
+          "text": "The HTTP port used by the application.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-04",
+      "technologyName": ".NET",
+      "topicName": ".NET Platform and Runtime",
+      "text": "What is the Base Class Library (BCL) in .NET?",
+      "answers": [
+        {
+          "text": "A set of fundamental reusable types and APIs provided by .NET.",
+          "isCorrect": true
+        },
+        {
+          "text": "A tool used only for CSS compilation.",
+          "isCorrect": false
+        },
+        {
+          "text": "A database engine built into every .NET project.",
+          "isCorrect": false
+        },
+        {
+          "text": "A JavaScript package registry.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-05",
+      "technologyName": ".NET",
+      "topicName": "SDK, Packages and Assemblies",
+      "text": "What is the .NET SDK used for?",
+      "answers": [
+        {
+          "text": "Developing, building, testing and publishing .NET applications.",
+          "isCorrect": true
+        },
+        {
+          "text": "Only running already-built .NET applications.",
+          "isCorrect": false
+        },
+        {
+          "text": "Managing Docker containers only.",
+          "isCorrect": false
+        },
+        {
+          "text": "Creating PostgreSQL indexes.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-06",
+      "technologyName": ".NET",
+      "topicName": "SDK, Packages and Assemblies",
+      "text": "What does the dotnet build command do?",
+      "answers": [
+        {
+          "text": "Builds a .NET project and its dependencies.",
+          "isCorrect": true
+        },
+        {
+          "text": "Starts PostgreSQL.",
+          "isCorrect": false
+        },
+        {
+          "text": "Deletes all NuGet packages.",
+          "isCorrect": false
+        },
+        {
+          "text": "Creates an Angular component.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-07",
+      "technologyName": ".NET",
+      "topicName": "SDK, Packages and Assemblies",
+      "text": "What is NuGet primarily used for in .NET projects?",
+      "answers": [
+        {
+          "text": "Managing reusable packages and project dependencies.",
+          "isCorrect": true
+        },
+        {
+          "text": "Managing Git branches.",
+          "isCorrect": false
+        },
+        {
+          "text": "Hosting HTTP endpoints.",
+          "isCorrect": false
+        },
+        {
+          "text": "Replacing the .NET runtime.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-08",
+      "technologyName": ".NET",
+      "topicName": "SDK, Packages and Assemblies",
+      "text": "What does a .NET assembly typically contain?",
+      "answers": [
+        {
+          "text": "Compiled code and metadata, commonly stored in a .dll or .exe.",
+          "isCorrect": true
+        },
+        {
+          "text": "Only plain-text SQL queries.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only CSS and image files.",
+          "isCorrect": false
+        },
+        {
+          "text": "A Docker daemon configuration.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-01",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Middleware and Routing",
+      "text": "What is middleware in ASP.NET Core?",
+      "answers": [
+        {
+          "text": "A component in the HTTP request pipeline that can process requests and responses.",
+          "isCorrect": true
+        },
+        {
+          "text": "A database table used for authentication.",
+          "isCorrect": false
+        },
+        {
+          "text": "A C# value type.",
+          "isCorrect": false
+        },
+        {
+          "text": "A frontend-only Angular service.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-02",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Middleware and Routing",
+      "text": "Why does middleware order matter in ASP.NET Core?",
+      "answers": [
+        {
+          "text": "Middleware executes in the order it is added for requests, so ordering can affect behavior.",
+          "isCorrect": true
+        },
+        {
+          "text": "Middleware is sorted alphabetically at runtime.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only the last middleware component is executed.",
+          "isCorrect": false
+        },
+        {
+          "text": "Order matters only for CSS files.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-03",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Middleware and Routing",
+      "text": "What is routing responsible for in ASP.NET Core?",
+      "answers": [
+        {
+          "text": "Matching incoming HTTP requests to application endpoints.",
+          "isCorrect": true
+        },
+        {
+          "text": "Encrypting every database column.",
+          "isCorrect": false
+        },
+        {
+          "text": "Compiling C# into JavaScript.",
+          "isCorrect": false
+        },
+        {
+          "text": "Creating Docker images.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-04",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Middleware and Routing",
+      "text": "What does MapControllers() do in a controller-based ASP.NET Core API?",
+      "answers": [
+        {
+          "text": "Adds endpoints for controller actions that use routing.",
+          "isCorrect": true
+        },
+        {
+          "text": "Registers PostgreSQL as a database provider.",
+          "isCorrect": false
+        },
+        {
+          "text": "Creates a new controller source file.",
+          "isCorrect": false
+        },
+        {
+          "text": "Automatically authenticates every request.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-05",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Dependency Injection and Web APIs",
+      "text": "What is dependency injection used for in ASP.NET Core?",
+      "answers": [
+        {
+          "text": "Supplying objects with the services they depend on instead of having them create those dependencies themselves.",
+          "isCorrect": true
+        },
+        {
+          "text": "Converting JSON into SQL.",
+          "isCorrect": false
+        },
+        {
+          "text": "Publishing Docker ports.",
+          "isCorrect": false
+        },
+        {
+          "text": "Replacing HTTP with TCP.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-06",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Dependency Injection and Web APIs",
+      "text": "In a typical ASP.NET Core web app, what does a scoped service lifetime mean?",
+      "answers": [
+        {
+          "text": "One service instance is created per request scope.",
+          "isCorrect": true
+        },
+        {
+          "text": "A new instance is created only once for the entire application lifetime.",
+          "isCorrect": false
+        },
+        {
+          "text": "A new instance is created for every property access.",
+          "isCorrect": false
+        },
+        {
+          "text": "The service can only be used by administrators.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-07",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Dependency Injection and Web APIs",
+      "text": "What is the difference between authentication and authorization?",
+      "answers": [
+        {
+          "text": "Authentication identifies who the user is; authorization determines what the user may access.",
+          "isCorrect": true
+        },
+        {
+          "text": "Authentication controls CSS; authorization controls HTML.",
+          "isCorrect": false
+        },
+        {
+          "text": "Authentication is for GET requests only; authorization is for POST requests only.",
+          "isCorrect": false
+        },
+        {
+          "text": "There is no difference.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-08",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Dependency Injection and Web APIs",
+      "text": "What is IActionResult useful for in an API controller action?",
+      "answers": [
+        {
+          "text": "Returning different HTTP result types such as Ok, NotFound or BadRequest.",
+          "isCorrect": true
+        },
+        {
+          "text": "Defining an EF Core entity.",
+          "isCorrect": false
+        },
+        {
+          "text": "Creating an Angular route.",
+          "isCorrect": false
+        },
+        {
+          "text": "Starting the Kestrel process manually.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-01",
+      "technologyName": "Angular",
+      "topicName": "Components and Templates",
+      "text": "What is an Angular component?",
+      "answers": [
+        {
+          "text": "A building block that combines a class with template-related metadata and a view.",
+          "isCorrect": true
+        },
+        {
+          "text": "A PostgreSQL table.",
+          "isCorrect": false
+        },
+        {
+          "text": "A Docker image layer.",
+          "isCorrect": false
+        },
+        {
+          "text": "A .NET assembly.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-02",
+      "technologyName": "Angular",
+      "topicName": "Components and Templates",
+      "text": "Which Angular syntax is used for interpolation in a template?",
+      "answers": [
+        {
+          "text": "{{ value }}",
+          "isCorrect": true
+        },
+        {
+          "text": "(value)",
+          "isCorrect": false
+        },
+        {
+          "text": "[value]",
+          "isCorrect": false
+        },
+        {
+          "text": "#{value}",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-03",
+      "technologyName": "Angular",
+      "topicName": "Components and Templates",
+      "text": "Which Angular syntax is used for event binding?",
+      "answers": [
+        {
+          "text": "(click)=\"handler()\"",
+          "isCorrect": true
+        },
+        {
+          "text": "[click]=\"handler()\"",
+          "isCorrect": false
+        },
+        {
+          "text": "{{ click }}=\"handler()\"",
+          "isCorrect": false
+        },
+        {
+          "text": "*click=\"handler()\"",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-04",
+      "technologyName": "Angular",
+      "topicName": "Components and Templates",
+      "text": "Which syntax binds an element property such as disabled to a component expression?",
+      "answers": [
+        {
+          "text": "[disabled]=\"isDisabled\"",
+          "isCorrect": true
+        },
+        {
+          "text": "(disabled)=\"isDisabled\"",
+          "isCorrect": false
+        },
+        {
+          "text": "{{disabled}}=\"isDisabled\"",
+          "isCorrect": false
+        },
+        {
+          "text": "#disabled=\"isDisabled\"",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-05",
+      "technologyName": "Angular",
+      "topicName": "Services, Forms and Routing",
+      "text": "What is an Angular service commonly used for?",
+      "answers": [
+        {
+          "text": "Sharing reusable logic, data access or state across parts of an application.",
+          "isCorrect": true
+        },
+        {
+          "text": "Defining SQL primary keys.",
+          "isCorrect": false
+        },
+        {
+          "text": "Replacing the browser DOM.",
+          "isCorrect": false
+        },
+        {
+          "text": "Building Docker images.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-06",
+      "technologyName": "Angular",
+      "topicName": "Services, Forms and Routing",
+      "text": "What does Angular dependency injection do?",
+      "answers": [
+        {
+          "text": "Provides dependencies such as services to classes that request them.",
+          "isCorrect": true
+        },
+        {
+          "text": "Automatically converts every class to JSON.",
+          "isCorrect": false
+        },
+        {
+          "text": "Stores all data in localStorage.",
+          "isCorrect": false
+        },
+        {
+          "text": "Compiles C# controllers.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-07",
+      "technologyName": "Angular",
+      "topicName": "Services, Forms and Routing",
+      "text": "What is required to use [(ngModel)] in a standalone component?",
+      "answers": [
+        {
+          "text": "The component must import FormsModule.",
+          "isCorrect": true
+        },
+        {
+          "text": "The component must import HttpClient only.",
+          "isCorrect": false
+        },
+        {
+          "text": "The backend must enable JWT.",
+          "isCorrect": false
+        },
+        {
+          "text": "The input must have type=\"number\".",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-08",
+      "technologyName": "Angular",
+      "topicName": "Services, Forms and Routing",
+      "text": "What is the purpose of an Angular route guard?",
+      "answers": [
+        {
+          "text": "To control whether navigation to a route is allowed based on application logic.",
+          "isCorrect": true
+        },
+        {
+          "text": "To replace server-side authorization completely.",
+          "isCorrect": false
+        },
+        {
+          "text": "To create database foreign keys.",
+          "isCorrect": false
+        },
+        {
+          "text": "To style the active navigation link.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-01",
+      "technologyName": "Node.js",
+      "topicName": "Runtime and Asynchronous I/O",
+      "text": "What is Node.js?",
+      "answers": [
+        {
+          "text": "A JavaScript runtime that can execute JavaScript outside the browser.",
+          "isCorrect": true
+        },
+        {
+          "text": "A relational database management system.",
+          "isCorrect": false
+        },
+        {
+          "text": "A CSS framework.",
+          "isCorrect": false
+        },
+        {
+          "text": "A Java virtual machine.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-02",
+      "technologyName": "Node.js",
+      "topicName": "Runtime and Asynchronous I/O",
+      "text": "What is the Node.js event loop used for?",
+      "answers": [
+        {
+          "text": "Coordinating asynchronous callbacks and non-blocking operations.",
+          "isCorrect": true
+        },
+        {
+          "text": "Compiling TypeScript into C#.",
+          "isCorrect": false
+        },
+        {
+          "text": "Storing Docker image layers.",
+          "isCorrect": false
+        },
+        {
+          "text": "Creating SQL foreign keys.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-03",
+      "technologyName": "Node.js",
+      "topicName": "Runtime and Asynchronous I/O",
+      "text": "Why is non-blocking I/O important in Node.js?",
+      "answers": [
+        {
+          "text": "It allows the process to continue handling other work while I/O operations are pending.",
+          "isCorrect": true
+        },
+        {
+          "text": "It guarantees every operation runs on a separate operating-system process.",
+          "isCorrect": false
+        },
+        {
+          "text": "It makes all code synchronous.",
+          "isCorrect": false
+        },
+        {
+          "text": "It removes the need for callbacks, promises or async functions.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-04",
+      "technologyName": "Node.js",
+      "topicName": "Runtime and Asynchronous I/O",
+      "text": "Where are environment variables commonly accessed in Node.js?",
+      "answers": [
+        {
+          "text": "process.env",
+          "isCorrect": true
+        },
+        {
+          "text": "window.env",
+          "isCorrect": false
+        },
+        {
+          "text": "document.env",
+          "isCorrect": false
+        },
+        {
+          "text": "node.environment",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-05",
+      "technologyName": "Node.js",
+      "topicName": "Modules and Packages",
+      "text": "Which function is traditionally used to load a CommonJS module?",
+      "answers": [
+        {
+          "text": "require()",
+          "isCorrect": true
+        },
+        {
+          "text": "include()",
+          "isCorrect": false
+        },
+        {
+          "text": "using()",
+          "isCorrect": false
+        },
+        {
+          "text": "loadModule()",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-06",
+      "technologyName": "Node.js",
+      "topicName": "Modules and Packages",
+      "text": "Which syntax belongs to ECMAScript modules?",
+      "answers": [
+        {
+          "text": "import and export",
+          "isCorrect": true
+        },
+        {
+          "text": "require and module.exports only",
+          "isCorrect": false
+        },
+        {
+          "text": "using and namespace",
+          "isCorrect": false
+        },
+        {
+          "text": "include and define",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-07",
+      "technologyName": "Node.js",
+      "topicName": "Modules and Packages",
+      "text": "What is package.json commonly used for?",
+      "answers": [
+        {
+          "text": "Project metadata, scripts and dependency declarations.",
+          "isCorrect": true
+        },
+        {
+          "text": "Storing compiled machine code only.",
+          "isCorrect": false
+        },
+        {
+          "text": "Defining PostgreSQL schemas.",
+          "isCorrect": false
+        },
+        {
+          "text": "Configuring browser CSS rules.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-08",
+      "technologyName": "Node.js",
+      "topicName": "Modules and Packages",
+      "text": "What does npm primarily provide in a Node.js project?",
+      "answers": [
+        {
+          "text": "Package management and access to the npm package ecosystem.",
+          "isCorrect": true
+        },
+        {
+          "text": "A replacement for the JavaScript language.",
+          "isCorrect": false
+        },
+        {
+          "text": "A relational database engine.",
+          "isCorrect": false
+        },
+        {
+          "text": "A Docker container runtime.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-01",
+      "technologyName": "Docker",
+      "topicName": "Images and Containers",
+      "text": "What is a Docker image?",
+      "answers": [
+        {
+          "text": "An immutable package of files, binaries, libraries and configuration used to create containers.",
+          "isCorrect": true
+        },
+        {
+          "text": "A running operating-system process that can never stop.",
+          "isCorrect": false
+        },
+        {
+          "text": "A database transaction log.",
+          "isCorrect": false
+        },
+        {
+          "text": "A Git branch.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-02",
+      "technologyName": "Docker",
+      "topicName": "Images and Containers",
+      "text": "What is a Docker container?",
+      "answers": [
+        {
+          "text": "An isolated running process created from a container image.",
+          "isCorrect": true
+        },
+        {
+          "text": "A source-control repository.",
+          "isCorrect": false
+        },
+        {
+          "text": "A C# interface.",
+          "isCorrect": false
+        },
+        {
+          "text": "A permanent copy of the host operating system.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-03",
+      "technologyName": "Docker",
+      "topicName": "Images and Containers",
+      "text": "What relationship best describes images and containers?",
+      "answers": [
+        {
+          "text": "An image is a template/package; a container is a runnable instance created from an image.",
+          "isCorrect": true
+        },
+        {
+          "text": "A container builds an image every time it reads a file.",
+          "isCorrect": false
+        },
+        {
+          "text": "Images and containers are exactly the same thing.",
+          "isCorrect": false
+        },
+        {
+          "text": "An image can only be created after its container is deleted.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-04",
+      "technologyName": "Docker",
+      "topicName": "Images and Containers",
+      "text": "What is one important property of Docker image layers?",
+      "answers": [
+        {
+          "text": "Images are composed of layers representing filesystem changes.",
+          "isCorrect": true
+        },
+        {
+          "text": "Every image must contain exactly one layer.",
+          "isCorrect": false
+        },
+        {
+          "text": "Layers are stored only in RAM.",
+          "isCorrect": false
+        },
+        {
+          "text": "Layers cannot be reused between images.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-05",
+      "technologyName": "Docker",
+      "topicName": "Dockerfile, Ports and Volumes",
+      "text": "What is a Dockerfile?",
+      "answers": [
+        {
+          "text": "A text file containing instructions used to build a Docker image.",
+          "isCorrect": true
+        },
+        {
+          "text": "A log file generated by a running container.",
+          "isCorrect": false
+        },
+        {
+          "text": "A JSON response from Docker Hub.",
+          "isCorrect": false
+        },
+        {
+          "text": "A database schema definition.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-06",
+      "technologyName": "Docker",
+      "topicName": "Dockerfile, Ports and Volumes",
+      "text": "Which Dockerfile instruction specifies the base image for a build stage?",
+      "answers": [
+        {
+          "text": "FROM",
+          "isCorrect": true
+        },
+        {
+          "text": "COPY",
+          "isCorrect": false
+        },
+        {
+          "text": "CMD",
+          "isCorrect": false
+        },
+        {
+          "text": "EXPOSE",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-07",
+      "technologyName": "Docker",
+      "topicName": "Dockerfile, Ports and Volumes",
+      "text": "Does EXPOSE by itself publish a container port to the host?",
+      "answers": [
+        {
+          "text": "No. It documents the intended port, but publishing is done when the container is run, for example with -p.",
+          "isCorrect": true
+        },
+        {
+          "text": "Yes. EXPOSE always publishes the port to every network interface.",
+          "isCorrect": false
+        },
+        {
+          "text": "Yes, but only for PostgreSQL containers.",
+          "isCorrect": false
+        },
+        {
+          "text": "No, because Docker containers cannot accept network traffic.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-08",
+      "technologyName": "Docker",
+      "topicName": "Dockerfile, Ports and Volumes",
+      "text": "What is a Docker volume mainly used for?",
+      "answers": [
+        {
+          "text": "Persisting or sharing data independently of a container writable layer.",
+          "isCorrect": true
+        },
+        {
+          "text": "Compiling application source code.",
+          "isCorrect": false
+        },
+        {
+          "text": "Replacing a Docker image registry.",
+          "isCorrect": false
+        },
+        {
+          "text": "Defining HTTP routes.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-01",
+      "technologyName": "SQL",
+      "topicName": "Queries and Aggregation",
+      "text": "Which clause filters individual rows before grouping and aggregation?",
+      "answers": [
+        {
+          "text": "WHERE",
+          "isCorrect": true
+        },
+        {
+          "text": "HAVING",
+          "isCorrect": false
+        },
+        {
+          "text": "ORDER BY",
+          "isCorrect": false
+        },
+        {
+          "text": "GROUP BY",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-02",
+      "technologyName": "SQL",
+      "topicName": "Queries and Aggregation",
+      "text": "Which clause groups rows that share the same values in selected columns?",
+      "answers": [
+        {
+          "text": "GROUP BY",
+          "isCorrect": true
+        },
+        {
+          "text": "ORDER BY",
+          "isCorrect": false
+        },
+        {
+          "text": "WHERE",
+          "isCorrect": false
+        },
+        {
+          "text": "VALUES",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-03",
+      "technologyName": "SQL",
+      "topicName": "Queries and Aggregation",
+      "text": "What does COUNT(*) return?",
+      "answers": [
+        {
+          "text": "The number of rows in the result/group, including rows containing NULL values in individual columns.",
+          "isCorrect": true
+        },
+        {
+          "text": "The sum of all numeric columns.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only the number of rows where every column is non-NULL.",
+          "isCorrect": false
+        },
+        {
+          "text": "The number of tables in the database.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-04",
+      "technologyName": "SQL",
+      "topicName": "Queries and Aggregation",
+      "text": "Which clause is commonly used to filter groups after GROUP BY?",
+      "answers": [
+        {
+          "text": "HAVING",
+          "isCorrect": true
+        },
+        {
+          "text": "WHERE only",
+          "isCorrect": false
+        },
+        {
+          "text": "SELECT INTO",
+          "isCorrect": false
+        },
+        {
+          "text": "VALUES",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-05",
+      "technologyName": "SQL",
+      "topicName": "Joins, Keys and Transactions",
+      "text": "What does an INNER JOIN return?",
+      "answers": [
+        {
+          "text": "Rows with matching join conditions from both joined inputs.",
+          "isCorrect": true
+        },
+        {
+          "text": "All rows from the left table regardless of matches.",
+          "isCorrect": false
+        },
+        {
+          "text": "All rows from both tables with no matching condition.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only rows containing NULL.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-06",
+      "technologyName": "SQL",
+      "topicName": "Joins, Keys and Transactions",
+      "text": "What does a LEFT JOIN return?",
+      "answers": [
+        {
+          "text": "All rows from the left input and matching rows from the right input, with NULLs for missing right-side matches.",
+          "isCorrect": true
+        },
+        {
+          "text": "Only rows that match on both sides.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only rows from the right input.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only rows where the join key is NULL.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-07",
+      "technologyName": "SQL",
+      "topicName": "Joins, Keys and Transactions",
+      "text": "What is the purpose of a foreign key?",
+      "answers": [
+        {
+          "text": "To enforce referential integrity between related tables.",
+          "isCorrect": true
+        },
+        {
+          "text": "To sort a table automatically.",
+          "isCorrect": false
+        },
+        {
+          "text": "To encrypt a column.",
+          "isCorrect": false
+        },
+        {
+          "text": "To guarantee that every column is unique.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-08",
+      "technologyName": "SQL",
+      "topicName": "Joins, Keys and Transactions",
+      "text": "What is the key idea of a database transaction?",
+      "answers": [
+        {
+          "text": "A group of operations can be treated as a single all-or-nothing unit of work.",
+          "isCorrect": true
+        },
+        {
+          "text": "Every statement must permanently commit immediately.",
+          "isCorrect": false
+        },
+        {
+          "text": "Transactions are used only for SELECT statements.",
+          "isCorrect": false
+        },
+        {
+          "text": "A transaction automatically creates a backup file.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-01",
+      "technologyName": "PostgreSQL",
+      "topicName": "PostgreSQL Features",
+      "text": "What does PostgreSQL RETURNING allow with INSERT, UPDATE or DELETE?",
+      "answers": [
+        {
+          "text": "Returning values from rows affected by the data-modification statement.",
+          "isCorrect": true
+        },
+        {
+          "text": "Automatically rolling back the transaction.",
+          "isCorrect": false
+        },
+        {
+          "text": "Creating an index on every modified column.",
+          "isCorrect": false
+        },
+        {
+          "text": "Converting the statement into a SELECT-only query.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-02",
+      "technologyName": "PostgreSQL",
+      "topicName": "PostgreSQL Features",
+      "text": "What is JSONB in PostgreSQL?",
+      "answers": [
+        {
+          "text": "A JSON data type stored in a decomposed binary format that supports efficient processing and indexing.",
+          "isCorrect": true
+        },
+        {
+          "text": "A text-only alias that cannot be indexed.",
+          "isCorrect": false
+        },
+        {
+          "text": "A replacement for every relational table.",
+          "isCorrect": false
+        },
+        {
+          "text": "A JavaScript runtime embedded in PostgreSQL.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-03",
+      "technologyName": "PostgreSQL",
+      "topicName": "PostgreSQL Features",
+      "text": "What does ILIKE provide in PostgreSQL?",
+      "answers": [
+        {
+          "text": "Case-insensitive pattern matching.",
+          "isCorrect": true
+        },
+        {
+          "text": "Case-sensitive numeric comparison.",
+          "isCorrect": false
+        },
+        {
+          "text": "Index creation.",
+          "isCorrect": false
+        },
+        {
+          "text": "Transaction isolation.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-04",
+      "technologyName": "PostgreSQL",
+      "topicName": "PostgreSQL Features",
+      "text": "What is ON CONFLICT commonly used for with INSERT?",
+      "answers": [
+        {
+          "text": "Handling uniqueness/exclusion conflicts, including DO NOTHING or DO UPDATE.",
+          "isCorrect": true
+        },
+        {
+          "text": "Starting a new database server.",
+          "isCorrect": false
+        },
+        {
+          "text": "Dropping foreign keys automatically.",
+          "isCorrect": false
+        },
+        {
+          "text": "Converting a table to JSONB.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-05",
+      "technologyName": "PostgreSQL",
+      "topicName": "Indexes and Constraints",
+      "text": "What does a PRIMARY KEY constraint guarantee for its key columns?",
+      "answers": [
+        {
+          "text": "Values are unique and not null.",
+          "isCorrect": true
+        },
+        {
+          "text": "Values are always strings.",
+          "isCorrect": false
+        },
+        {
+          "text": "Rows are automatically sorted physically by the key.",
+          "isCorrect": false
+        },
+        {
+          "text": "The table can contain only one row.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-06",
+      "technologyName": "PostgreSQL",
+      "topicName": "Indexes and Constraints",
+      "text": "What does a FOREIGN KEY constraint enforce?",
+      "answers": [
+        {
+          "text": "Referenced values must correspond to valid rows in the referenced table, subject to the constraint rules.",
+          "isCorrect": true
+        },
+        {
+          "text": "Every column must have an index.",
+          "isCorrect": false
+        },
+        {
+          "text": "All values in the column must be unique.",
+          "isCorrect": false
+        },
+        {
+          "text": "The table cannot be updated.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-07",
+      "technologyName": "PostgreSQL",
+      "topicName": "Indexes and Constraints",
+      "text": "What is a common trade-off of adding an index?",
+      "answers": [
+        {
+          "text": "It can speed up suitable reads but adds storage and write-maintenance cost.",
+          "isCorrect": true
+        },
+        {
+          "text": "It always makes every query slower.",
+          "isCorrect": false
+        },
+        {
+          "text": "It removes the need for primary keys.",
+          "isCorrect": false
+        },
+        {
+          "text": "It prevents INSERT statements.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-08",
+      "technologyName": "PostgreSQL",
+      "topicName": "Indexes and Constraints",
+      "text": "Which PostgreSQL data type represents true/false logical values?",
+      "answers": [
+        {
+          "text": "boolean",
+          "isCorrect": true
+        },
+        {
+          "text": "varchar",
+          "isCorrect": false
+        },
+        {
+          "text": "timestamp",
+          "isCorrect": false
+        },
+        {
+          "text": "jsonb",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-01",
+      "technologyName": "Java",
+      "topicName": "OOP and Inheritance",
+      "text": "Except for Object, how many direct superclasses can a Java class have?",
+      "answers": [
+        {
+          "text": "Exactly one.",
+          "isCorrect": true
+        },
+        {
+          "text": "Any number.",
+          "isCorrect": false
+        },
+        {
+          "text": "Exactly two.",
+          "isCorrect": false
+        },
+        {
+          "text": "None; Java classes cannot inherit.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-02",
+      "technologyName": "Java",
+      "topicName": "OOP and Inheritance",
+      "text": "What is the top class of the Java class hierarchy?",
+      "answers": [
+        {
+          "text": "Object",
+          "isCorrect": true
+        },
+        {
+          "text": "Main",
+          "isCorrect": false
+        },
+        {
+          "text": "Class",
+          "isCorrect": false
+        },
+        {
+          "text": "System",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-03",
+      "technologyName": "Java",
+      "topicName": "OOP and Inheritance",
+      "text": "Can an abstract Java class be instantiated directly?",
+      "answers": [
+        {
+          "text": "No.",
+          "isCorrect": true
+        },
+        {
+          "text": "Yes, always.",
+          "isCorrect": false
+        },
+        {
+          "text": "Yes, but only if it has no fields.",
+          "isCorrect": false
+        },
+        {
+          "text": "Yes, but only from another abstract class.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-04",
+      "technologyName": "Java",
+      "topicName": "OOP and Inheritance",
+      "text": "What does declaring a Java class final prevent?",
+      "answers": [
+        {
+          "text": "The class from being subclassed.",
+          "isCorrect": true
+        },
+        {
+          "text": "The class from having constructors.",
+          "isCorrect": false
+        },
+        {
+          "text": "The class from creating objects.",
+          "isCorrect": false
+        },
+        {
+          "text": "The class from implementing an interface.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-05",
+      "technologyName": "Java",
+      "topicName": "Interfaces and Collections",
+      "text": "Which keyword does a Java class use to implement an interface?",
+      "answers": [
+        {
+          "text": "implements",
+          "isCorrect": true
+        },
+        {
+          "text": "extends only",
+          "isCorrect": false
+        },
+        {
+          "text": "inherits",
+          "isCorrect": false
+        },
+        {
+          "text": "interface",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-06",
+      "technologyName": "Java",
+      "topicName": "Interfaces and Collections",
+      "text": "Can a Java class implement more than one interface?",
+      "answers": [
+        {
+          "text": "Yes.",
+          "isCorrect": true
+        },
+        {
+          "text": "No, a class can use only one interface.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only if the class is abstract.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only if all interfaces are empty.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-07",
+      "technologyName": "Java",
+      "topicName": "Interfaces and Collections",
+      "text": "Which collection interface represents an ordered collection that can contain duplicate elements?",
+      "answers": [
+        {
+          "text": "List",
+          "isCorrect": true
+        },
+        {
+          "text": "Set",
+          "isCorrect": false
+        },
+        {
+          "text": "Map",
+          "isCorrect": false
+        },
+        {
+          "text": "SortedSet only",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-08",
+      "technologyName": "Java",
+      "topicName": "Interfaces and Collections",
+      "text": "Which collection interface does not allow duplicate elements?",
+      "answers": [
+        {
+          "text": "Set",
+          "isCorrect": true
+        },
+        {
+          "text": "List",
+          "isCorrect": false
+        },
+        {
+          "text": "Queue",
+          "isCorrect": false
+        },
+        {
+          "text": "Collection always allows duplicates",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-09",
+      "technologyName": "C#",
+      "topicName": "Types and OOP",
+      "text": "What normally happens when one variable of a C# class type is assigned to another?",
+      "answers": [
+        {
+          "text": "The object reference is copied, so both variables can refer to the same object.",
+          "isCorrect": true
+        },
+        {
+          "text": "A deep copy of the entire object is always created.",
+          "isCorrect": false
+        },
+        {
+          "text": "The assignment is illegal unless the class is sealed.",
+          "isCorrect": false
+        },
+        {
+          "text": "The original object is automatically disposed.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-10",
+      "technologyName": "C#",
+      "topicName": "Types and OOP",
+      "text": "Which base-class modifier commonly allows a derived class to replace a method implementation with override?",
+      "answers": [
+        {
+          "text": "virtual",
+          "isCorrect": true
+        },
+        {
+          "text": "private",
+          "isCorrect": false
+        },
+        {
+          "text": "const",
+          "isCorrect": false
+        },
+        {
+          "text": "readonly",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-11",
+      "technologyName": "C#",
+      "topicName": "Collections and Language Features",
+      "text": "Which generic collection stores key/value pairs with unique keys?",
+      "answers": [
+        {
+          "text": "Dictionary<TKey, TValue>",
+          "isCorrect": true
+        },
+        {
+          "text": "List<T>",
+          "isCorrect": false
+        },
+        {
+          "text": "Queue<T>",
+          "isCorrect": false
+        },
+        {
+          "text": "Stack<T>",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "CS-12",
+      "technologyName": "C#",
+      "topicName": "Collections and Language Features",
+      "text": "What does LINQ Select primarily do?",
+      "answers": [
+        {
+          "text": "Projects each source element into a new value or shape.",
+          "isCorrect": true
+        },
+        {
+          "text": "Filters source elements using a boolean condition.",
+          "isCorrect": false
+        },
+        {
+          "text": "Always sorts the collection in descending order.",
+          "isCorrect": false
+        },
+        {
+          "text": "Catches exceptions raised during enumeration.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-09",
+      "technologyName": ".NET",
+      "topicName": ".NET Platform and Runtime",
+      "text": "What is the role of JIT compilation in the common .NET execution model?",
+      "answers": [
+        {
+          "text": "It converts intermediate language for methods into native machine code for execution.",
+          "isCorrect": true
+        },
+        {
+          "text": "It converts SQL into Entity Framework models.",
+          "isCorrect": false
+        },
+        {
+          "text": "It downloads NuGet packages at runtime.",
+          "isCorrect": false
+        },
+        {
+          "text": "It permanently replaces the garbage collector.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-10",
+      "technologyName": ".NET",
+      "topicName": ".NET Platform and Runtime",
+      "text": "Which statement best distinguishes the .NET SDK from the .NET runtime?",
+      "answers": [
+        {
+          "text": "The SDK contains development/build tools, while the runtime provides the environment needed to execute compatible applications.",
+          "isCorrect": true
+        },
+        {
+          "text": "The runtime contains compilers but the SDK never does.",
+          "isCorrect": false
+        },
+        {
+          "text": "The SDK is only for web applications.",
+          "isCorrect": false
+        },
+        {
+          "text": "They are two names for exactly the same installation.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-11",
+      "technologyName": ".NET",
+      "topicName": "SDK, Packages and Assemblies",
+      "text": "What is the main purpose of dotnet restore?",
+      "answers": [
+        {
+          "text": "To resolve project dependencies and make required NuGet packages available.",
+          "isCorrect": true
+        },
+        {
+          "text": "To start the application web server.",
+          "isCorrect": false
+        },
+        {
+          "text": "To convert a DLL into source code.",
+          "isCorrect": false
+        },
+        {
+          "text": "To delete all project build output.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOTNET-12",
+      "technologyName": ".NET",
+      "topicName": "SDK, Packages and Assemblies",
+      "text": "What is an important difference between a namespace and an assembly in .NET?",
+      "answers": [
+        {
+          "text": "A namespace organizes type names, while an assembly is a compiled deployment/loading unit.",
+          "isCorrect": true
+        },
+        {
+          "text": "A namespace is a compiled DLL and an assembly is only a folder name.",
+          "isCorrect": false
+        },
+        {
+          "text": "Assemblies exist only in source code.",
+          "isCorrect": false
+        },
+        {
+          "text": "Namespaces contain only NuGet package metadata.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-09",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Middleware and Routing",
+      "text": "What does it mean when middleware short-circuits the ASP.NET Core request pipeline?",
+      "answers": [
+        {
+          "text": "It produces the response without invoking later middleware/endpoints.",
+          "isCorrect": true
+        },
+        {
+          "text": "It restarts the application process.",
+          "isCorrect": false
+        },
+        {
+          "text": "It automatically disables authorization.",
+          "isCorrect": false
+        },
+        {
+          "text": "It converts every request into a redirect.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-10",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Middleware and Routing",
+      "text": "In [HttpGet(\"{id}\")], where is the id value normally obtained for a matching request?",
+      "answers": [
+        {
+          "text": "From the route segment.",
+          "isCorrect": true
+        },
+        {
+          "text": "Only from the JSON request body.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only from a cookie.",
+          "isCorrect": false
+        },
+        {
+          "text": "From the response status code.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-11",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Dependency Injection and Web APIs",
+      "text": "What does a transient service lifetime mean?",
+      "answers": [
+        {
+          "text": "A new service instance is created each time the service is requested from the container.",
+          "isCorrect": true
+        },
+        {
+          "text": "Exactly one instance exists for the entire application.",
+          "isCorrect": false
+        },
+        {
+          "text": "Exactly one instance exists for all applications on the server.",
+          "isCorrect": false
+        },
+        {
+          "text": "The service can be used only in background threads.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ASPNET-12",
+      "technologyName": "ASP.NET Core",
+      "topicName": "Dependency Injection and Web APIs",
+      "text": "What is a major reason to use DTOs in a Web API?",
+      "answers": [
+        {
+          "text": "They define an API data contract without requiring persistence entities to be exposed directly.",
+          "isCorrect": true
+        },
+        {
+          "text": "They replace HTTP routing.",
+          "isCorrect": false
+        },
+        {
+          "text": "They automatically create database indexes.",
+          "isCorrect": false
+        },
+        {
+          "text": "They remove the need for authorization.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-09",
+      "technologyName": "Angular",
+      "topicName": "Components and Templates",
+      "text": "Which Angular syntax represents two-way binding?",
+      "answers": [
+        {
+          "text": "[(value)]",
+          "isCorrect": true
+        },
+        {
+          "text": "{{ value }}",
+          "isCorrect": false
+        },
+        {
+          "text": "(value)",
+          "isCorrect": false
+        },
+        {
+          "text": "[value]",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-10",
+      "technologyName": "Angular",
+      "topicName": "Components and Templates",
+      "text": "What is the purpose of the track expression in an Angular @for block?",
+      "answers": [
+        {
+          "text": "It helps Angular associate rendered views with data items efficiently.",
+          "isCorrect": true
+        },
+        {
+          "text": "It sends the loop data to the backend.",
+          "isCorrect": false
+        },
+        {
+          "text": "It changes every item into a signal.",
+          "isCorrect": false
+        },
+        {
+          "text": "It makes the loop execute only once.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-11",
+      "technologyName": "Angular",
+      "topicName": "Services, Forms and Routing",
+      "text": "What does Angular HttpClient return for an HTTP request by default?",
+      "answers": [
+        {
+          "text": "An Observable representing the asynchronous response.",
+          "isCorrect": true
+        },
+        {
+          "text": "A synchronous database connection.",
+          "isCorrect": false
+        },
+        {
+          "text": "An HTML element.",
+          "isCorrect": false
+        },
+        {
+          "text": "A route guard.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "ANG-12",
+      "technologyName": "Angular",
+      "topicName": "Services, Forms and Routing",
+      "text": "Why is backend authorization still required when Angular route guards are used?",
+      "answers": [
+        {
+          "text": "Client-side guards can be bypassed, so the server must enforce access rules itself.",
+          "isCorrect": true
+        },
+        {
+          "text": "Route guards work only in development mode.",
+          "isCorrect": false
+        },
+        {
+          "text": "Angular guards encrypt HTTP responses.",
+          "isCorrect": false
+        },
+        {
+          "text": "Backend authorization is required only for CSS files.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-09",
+      "technologyName": "Node.js",
+      "topicName": "Runtime and Asynchronous I/O",
+      "text": "Which kind of work can still block other requests if performed as a long synchronous JavaScript operation?",
+      "answers": [
+        {
+          "text": "CPU-intensive computation on the event-loop thread.",
+          "isCorrect": true
+        },
+        {
+          "text": "Waiting on a properly asynchronous network request.",
+          "isCorrect": false
+        },
+        {
+          "text": "A resolved Promise that has no callback.",
+          "isCorrect": false
+        },
+        {
+          "text": "Reading an environment variable.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-10",
+      "technologyName": "Node.js",
+      "topicName": "Runtime and Asynchronous I/O",
+      "text": "Does adding async to a function automatically move heavy synchronous CPU work to another thread?",
+      "answers": [
+        {
+          "text": "No. Heavy synchronous JavaScript can still block the event loop.",
+          "isCorrect": true
+        },
+        {
+          "text": "Yes. Every async function always runs in a separate OS process.",
+          "isCorrect": false
+        },
+        {
+          "text": "Yes. V8 sends every loop to the database.",
+          "isCorrect": false
+        },
+        {
+          "text": "Only when process.env is defined.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-11",
+      "technologyName": "Node.js",
+      "topicName": "Modules and Packages",
+      "text": "What does \"type\": \"module\" in package.json tell Node.js about .js files in that package?",
+      "answers": [
+        {
+          "text": "They should be interpreted using ECMAScript module semantics.",
+          "isCorrect": true
+        },
+        {
+          "text": "They should always be interpreted as JSON.",
+          "isCorrect": false
+        },
+        {
+          "text": "They become Docker modules.",
+          "isCorrect": false
+        },
+        {
+          "text": "They can no longer import other files.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "NODE-12",
+      "technologyName": "Node.js",
+      "topicName": "Modules and Packages",
+      "text": "What is a main purpose of package-lock.json in an npm application?",
+      "answers": [
+        {
+          "text": "To record resolved dependency information for more repeatable installs.",
+          "isCorrect": true
+        },
+        {
+          "text": "To store environment secrets.",
+          "isCorrect": false
+        },
+        {
+          "text": "To replace package.json scripts.",
+          "isCorrect": false
+        },
+        {
+          "text": "To compile JavaScript into native machine code.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-09",
+      "technologyName": "Docker",
+      "topicName": "Images and Containers",
+      "text": "What does docker run primarily create and start?",
+      "answers": [
+        {
+          "text": "A container based on an image.",
+          "isCorrect": true
+        },
+        {
+          "text": "A new Dockerfile.",
+          "isCorrect": false
+        },
+        {
+          "text": "A new operating-system kernel.",
+          "isCorrect": false
+        },
+        {
+          "text": "A NuGet package.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-10",
+      "technologyName": "Docker",
+      "topicName": "Images and Containers",
+      "text": "What is a container registry used for?",
+      "answers": [
+        {
+          "text": "Storing and distributing container images.",
+          "isCorrect": true
+        },
+        {
+          "text": "Executing SQL transactions.",
+          "isCorrect": false
+        },
+        {
+          "text": "Managing browser routes.",
+          "isCorrect": false
+        },
+        {
+          "text": "Replacing container volumes.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-11",
+      "technologyName": "Docker",
+      "topicName": "Dockerfile, Ports and Volumes",
+      "text": "What is the key difference between RUN and CMD/ENTRYPOINT in a Dockerfile?",
+      "answers": [
+        {
+          "text": "RUN executes during image build, while CMD/ENTRYPOINT participate in container startup.",
+          "isCorrect": true
+        },
+        {
+          "text": "RUN publishes ports and CMD creates volumes.",
+          "isCorrect": false
+        },
+        {
+          "text": "RUN can only be used on Windows.",
+          "isCorrect": false
+        },
+        {
+          "text": "CMD executes only while building the image.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "DOCKER-12",
+      "technologyName": "Docker",
+      "topicName": "Dockerfile, Ports and Volumes",
+      "text": "What does docker run -p 5000:8080 mean?",
+      "answers": [
+        {
+          "text": "Host port 5000 is published and mapped to container port 8080.",
+          "isCorrect": true
+        },
+        {
+          "text": "Container port 5000 is always mapped to host port 80.",
+          "isCorrect": false
+        },
+        {
+          "text": "Both numbers represent image tags.",
+          "isCorrect": false
+        },
+        {
+          "text": "The command creates a volume named 5000.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-09",
+      "technologyName": "SQL",
+      "topicName": "Queries and Aggregation",
+      "text": "What is the difference between COUNT(*) and COUNT(column)?",
+      "answers": [
+        {
+          "text": "COUNT(*) counts rows, while COUNT(column) does not count rows where that expression is NULL.",
+          "isCorrect": true
+        },
+        {
+          "text": "COUNT(column) counts every row but COUNT(*) ignores NULL rows.",
+          "isCorrect": false
+        },
+        {
+          "text": "COUNT(*) can be used only with GROUP BY.",
+          "isCorrect": false
+        },
+        {
+          "text": "There is never any difference.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-10",
+      "technologyName": "SQL",
+      "topicName": "Queries and Aggregation",
+      "text": "Which clause should be used when a specific result ordering is required?",
+      "answers": [
+        {
+          "text": "ORDER BY",
+          "isCorrect": true
+        },
+        {
+          "text": "HAVING",
+          "isCorrect": false
+        },
+        {
+          "text": "GROUP BY",
+          "isCorrect": false
+        },
+        {
+          "text": "DISTINCT",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-11",
+      "technologyName": "SQL",
+      "topicName": "Joins, Keys and Transactions",
+      "text": "What does ROLLBACK do to an uncommitted transaction?",
+      "answers": [
+        {
+          "text": "It cancels the transaction's changes according to the transaction state.",
+          "isCorrect": true
+        },
+        {
+          "text": "It permanently commits all changes.",
+          "isCorrect": false
+        },
+        {
+          "text": "It creates a foreign key.",
+          "isCorrect": false
+        },
+        {
+          "text": "It converts an INNER JOIN into a LEFT JOIN.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "SQL-12",
+      "technologyName": "SQL",
+      "topicName": "Joins, Keys and Transactions",
+      "text": "What is a composite primary key?",
+      "answers": [
+        {
+          "text": "A primary key made from more than one column.",
+          "isCorrect": true
+        },
+        {
+          "text": "Two unrelated tables that both have an id column.",
+          "isCorrect": false
+        },
+        {
+          "text": "A foreign key with no referenced table.",
+          "isCorrect": false
+        },
+        {
+          "text": "An index that permits duplicate rows only.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-09",
+      "technologyName": "PostgreSQL",
+      "topicName": "PostgreSQL Features",
+      "text": "What does a WITH clause define in SQL/PostgreSQL?",
+      "answers": [
+        {
+          "text": "One or more common table expressions that can be used by a larger statement.",
+          "isCorrect": true
+        },
+        {
+          "text": "A permanent database user.",
+          "isCorrect": false
+        },
+        {
+          "text": "A Docker volume.",
+          "isCorrect": false
+        },
+        {
+          "text": "A primary-key sequence only.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-10",
+      "technologyName": "PostgreSQL",
+      "topicName": "PostgreSQL Features",
+      "text": "Which PostgreSQL feature is a modern SQL-standard way to define automatically generated numeric column values?",
+      "answers": [
+        {
+          "text": "An identity column such as GENERATED BY DEFAULT AS IDENTITY.",
+          "isCorrect": true
+        },
+        {
+          "text": "ILIKE.",
+          "isCorrect": false
+        },
+        {
+          "text": "A LEFT JOIN.",
+          "isCorrect": false
+        },
+        {
+          "text": "ROLLBACK.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-11",
+      "technologyName": "PostgreSQL",
+      "topicName": "Indexes and Constraints",
+      "text": "Which PostgreSQL index method is the default for CREATE INDEX when no method is specified?",
+      "answers": [
+        {
+          "text": "B-tree.",
+          "isCorrect": true
+        },
+        {
+          "text": "JSONB.",
+          "isCorrect": false
+        },
+        {
+          "text": "Foreign key.",
+          "isCorrect": false
+        },
+        {
+          "text": "Heap-only tuple.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "PG-12",
+      "technologyName": "PostgreSQL",
+      "topicName": "Indexes and Constraints",
+      "text": "What is the purpose of a CHECK constraint?",
+      "answers": [
+        {
+          "text": "To require row values to satisfy a boolean condition.",
+          "isCorrect": true
+        },
+        {
+          "text": "To sort query results automatically.",
+          "isCorrect": false
+        },
+        {
+          "text": "To publish a database port.",
+          "isCorrect": false
+        },
+        {
+          "text": "To create a REST endpoint.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-09",
+      "technologyName": "Java",
+      "topicName": "OOP and Inheritance",
+      "text": "What does a final method prevent in Java?",
+      "answers": [
+        {
+          "text": "The method cannot be overridden by subclasses.",
+          "isCorrect": true
+        },
+        {
+          "text": "The method cannot be called.",
+          "isCorrect": false
+        },
+        {
+          "text": "The class automatically becomes abstract.",
+          "isCorrect": false
+        },
+        {
+          "text": "The method can run only once.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-10",
+      "technologyName": "Java",
+      "topicName": "OOP and Inheritance",
+      "text": "Why is @Override useful on an overriding Java method?",
+      "answers": [
+        {
+          "text": "It lets the compiler verify that the method actually overrides a superclass/interface method.",
+          "isCorrect": true
+        },
+        {
+          "text": "It allows a class to extend two classes.",
+          "isCorrect": false
+        },
+        {
+          "text": "It makes every field immutable.",
+          "isCorrect": false
+        },
+        {
+          "text": "It turns the method into a constructor.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-11",
+      "technologyName": "Java",
+      "topicName": "Interfaces and Collections",
+      "text": "Which statement about Map is correct?",
+      "answers": [
+        {
+          "text": "Map stores key/value associations and is not a subtype of the Collection interface.",
+          "isCorrect": true
+        },
+        {
+          "text": "Map is an ordered List that always allows duplicate keys.",
+          "isCorrect": false
+        },
+        {
+          "text": "Map can store values but never keys.",
+          "isCorrect": false
+        },
+        {
+          "text": "Every Map is also a Set implementation.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "code": "JAVA-12",
+      "technologyName": "Java",
+      "topicName": "Interfaces and Collections",
+      "text": "What is a primary benefit of generics such as List<String>?",
+      "answers": [
+        {
+          "text": "Compile-time type safety with fewer casts.",
+          "isCorrect": true
+        },
+        {
+          "text": "They make every collection thread-safe.",
+          "isCorrect": false
+        },
+        {
+          "text": "They prevent all runtime exceptions.",
+          "isCorrect": false
+        },
+        {
+          "text": "They automatically persist values to a database.",
+          "isCorrect": false
+        }
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "technologyName": "C#",
+      "title": "C# Types and OOP",
+      "description": "Core C# questions about types, interfaces, inheritance and overriding.",
+      "isPublished": true,
+      "questionCodes": [
+        "CS-01",
+        "CS-02",
+        "CS-03",
+        "CS-04",
+        "CS-09",
+        "CS-10"
+      ]
+    },
+    {
+      "technologyName": "C#",
+      "title": "C# Collections and Features",
+      "description": "Questions about LINQ, collections, exceptions and sealed classes.",
+      "isPublished": true,
+      "questionCodes": [
+        "CS-05",
+        "CS-06",
+        "CS-07",
+        "CS-08",
+        "CS-11",
+        "CS-12"
+      ]
+    },
+    {
+      "technologyName": ".NET",
+      "title": ".NET Platform Fundamentals",
+      "description": "Questions about the runtime, garbage collection, target frameworks and the BCL.",
+      "isPublished": true,
+      "questionCodes": [
+        "DOTNET-01",
+        "DOTNET-02",
+        "DOTNET-03",
+        "DOTNET-04",
+        "DOTNET-09",
+        "DOTNET-10"
+      ]
+    },
+    {
+      "technologyName": ".NET",
+      "title": ".NET SDK and Packages",
+      "description": "Questions about the SDK, build command, NuGet and assemblies.",
+      "isPublished": true,
+      "questionCodes": [
+        "DOTNET-05",
+        "DOTNET-06",
+        "DOTNET-07",
+        "DOTNET-08",
+        "DOTNET-11",
+        "DOTNET-12"
+      ]
+    },
+    {
+      "technologyName": "ASP.NET Core",
+      "title": "ASP.NET Core Pipeline and Routing",
+      "description": "Questions about middleware, request pipeline and routing.",
+      "isPublished": true,
+      "questionCodes": [
+        "ASPNET-01",
+        "ASPNET-02",
+        "ASPNET-03",
+        "ASPNET-04",
+        "ASPNET-09",
+        "ASPNET-10"
+      ]
+    },
+    {
+      "technologyName": "ASP.NET Core",
+      "title": "ASP.NET Core APIs and DI",
+      "description": "Questions about dependency injection, service lifetimes, auth and controller results.",
+      "isPublished": true,
+      "questionCodes": [
+        "ASPNET-05",
+        "ASPNET-06",
+        "ASPNET-07",
+        "ASPNET-08",
+        "ASPNET-11",
+        "ASPNET-12"
+      ]
+    },
+    {
+      "technologyName": "Angular",
+      "title": "Angular Components and Templates",
+      "description": "Questions about components, interpolation and bindings.",
+      "isPublished": true,
+      "questionCodes": [
+        "ANG-01",
+        "ANG-02",
+        "ANG-03",
+        "ANG-04",
+        "ANG-09",
+        "ANG-10"
+      ]
+    },
+    {
+      "technologyName": "Angular",
+      "title": "Angular Services and Routing",
+      "description": "Questions about services, dependency injection, forms and route guards.",
+      "isPublished": true,
+      "questionCodes": [
+        "ANG-05",
+        "ANG-06",
+        "ANG-07",
+        "ANG-08",
+        "ANG-11",
+        "ANG-12"
+      ]
+    },
+    {
+      "technologyName": "Node.js",
+      "title": "Node.js Runtime Basics",
+      "description": "Questions about the runtime, event loop, non-blocking I/O and environment variables.",
+      "isPublished": true,
+      "questionCodes": [
+        "NODE-01",
+        "NODE-02",
+        "NODE-03",
+        "NODE-04",
+        "NODE-09",
+        "NODE-10"
+      ]
+    },
+    {
+      "technologyName": "Node.js",
+      "title": "Node.js Modules and Packages",
+      "description": "Questions about CommonJS, ES modules, package.json and npm.",
+      "isPublished": true,
+      "questionCodes": [
+        "NODE-05",
+        "NODE-06",
+        "NODE-07",
+        "NODE-08",
+        "NODE-11",
+        "NODE-12"
+      ]
+    },
+    {
+      "technologyName": "Docker",
+      "title": "Docker Images and Containers",
+      "description": "Questions about images, containers and image layers.",
+      "isPublished": true,
+      "questionCodes": [
+        "DOCKER-01",
+        "DOCKER-02",
+        "DOCKER-03",
+        "DOCKER-04",
+        "DOCKER-09",
+        "DOCKER-10"
+      ]
+    },
+    {
+      "technologyName": "Docker",
+      "title": "Dockerfile, Ports and Storage",
+      "description": "Questions about Dockerfiles, FROM, port publishing and volumes.",
+      "isPublished": true,
+      "questionCodes": [
+        "DOCKER-05",
+        "DOCKER-06",
+        "DOCKER-07",
+        "DOCKER-08",
+        "DOCKER-11",
+        "DOCKER-12"
+      ]
+    },
+    {
+      "technologyName": "SQL",
+      "title": "SQL Query Fundamentals",
+      "description": "Questions about filtering, grouping and aggregate queries.",
+      "isPublished": true,
+      "questionCodes": [
+        "SQL-01",
+        "SQL-02",
+        "SQL-03",
+        "SQL-04",
+        "SQL-09",
+        "SQL-10"
+      ]
+    },
+    {
+      "technologyName": "SQL",
+      "title": "SQL Joins and Transactions",
+      "description": "Questions about joins, foreign keys and transactions.",
+      "isPublished": true,
+      "questionCodes": [
+        "SQL-05",
+        "SQL-06",
+        "SQL-07",
+        "SQL-08",
+        "SQL-11",
+        "SQL-12"
+      ]
+    },
+    {
+      "technologyName": "PostgreSQL",
+      "title": "PostgreSQL Useful Features",
+      "description": "Questions about RETURNING, JSONB, ILIKE and ON CONFLICT.",
+      "isPublished": true,
+      "questionCodes": [
+        "PG-01",
+        "PG-02",
+        "PG-03",
+        "PG-04",
+        "PG-09",
+        "PG-10"
+      ]
+    },
+    {
+      "technologyName": "PostgreSQL",
+      "title": "PostgreSQL Constraints and Indexes",
+      "description": "Questions about keys, indexes and boolean values.",
+      "isPublished": true,
+      "questionCodes": [
+        "PG-05",
+        "PG-06",
+        "PG-07",
+        "PG-08",
+        "PG-11",
+        "PG-12"
+      ]
+    },
+    {
+      "technologyName": "Java",
+      "title": "Java OOP and Inheritance",
+      "description": "Questions about superclass rules, Object, abstract and final classes.",
+      "isPublished": true,
+      "questionCodes": [
+        "JAVA-01",
+        "JAVA-02",
+        "JAVA-03",
+        "JAVA-04",
+        "JAVA-09",
+        "JAVA-10"
+      ]
+    },
+    {
+      "technologyName": "Java",
+      "title": "Java Interfaces and Collections",
+      "description": "Questions about interfaces, List and Set.",
+      "isPublished": true,
+      "questionCodes": [
+        "JAVA-05",
+        "JAVA-06",
+        "JAVA-07",
+        "JAVA-08",
+        "JAVA-11",
+        "JAVA-12"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "technology": "C#",
+      "source": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/dotnet/csharp/",
+      "note": "Type system, classes, inheritance, interfaces, collections, LINQ and exception-handling fundamentals."
+    },
+    {
+      "technology": ".NET",
+      "source": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/dotnet/",
+      "note": ".NET runtime, SDK, target frameworks, assemblies, garbage collection and NuGet fundamentals."
+    },
+    {
+      "technology": "ASP.NET Core",
+      "source": "Microsoft Learn",
+      "url": "https://learn.microsoft.com/aspnet/core/",
+      "note": "Middleware, routing, dependency injection, controllers, authorization and Web API fundamentals."
+    },
+    {
+      "technology": "Angular",
+      "source": "Angular official documentation",
+      "url": "https://angular.dev/",
+      "note": "Components, templates, bindings, built-in control flow, services, dependency injection, forms and routing."
+    },
+    {
+      "technology": "Node.js",
+      "source": "Node.js official documentation",
+      "url": "https://nodejs.org/docs/latest/api/",
+      "note": "Runtime/event-loop concepts, asynchronous I/O, CommonJS, ECMAScript modules and packages."
+    },
+    {
+      "technology": "Docker",
+      "source": "Docker Docs",
+      "url": "https://docs.docker.com/",
+      "note": "Images, containers, Dockerfile instructions, ports, volumes and registries."
+    },
+    {
+      "technology": "SQL/PostgreSQL",
+      "source": "PostgreSQL 18 documentation",
+      "url": "https://www.postgresql.org/docs/current/",
+      "note": "Queries, joins, grouping, transactions, constraints, indexes and PostgreSQL-specific features."
+    },
+    {
+      "technology": "Java",
+      "source": "Oracle Java documentation/tutorials",
+      "url": "https://docs.oracle.com/javase/",
+      "note": "Object-oriented programming, inheritance, abstract/final classes, interfaces, generics and collections."
+    }
+  ],
+  "contentFormat": "markdown"
+}

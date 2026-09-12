@@ -1,0 +1,529 @@
+<div class="applications-page">
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <div>
+        <h1>Job Applications</h1>
+        <p>
+          Track your applications and stay organized
+          throughout the hiring process.
+        </p>
+      </div>
+
+      @if (!showForm) {
+        <button
+          type="button"
+          class="add-button"
+          (click)="openForm()">
+          <span>+</span>
+          Add Application
+        </button>
+      }
+    </div>
+    <div class="application-filters">
+
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search company or position..."
+        (ngModelChange)="applyFilters()"
+      />
+
+
+      <select
+        [(ngModel)]="statusFilter"
+        (change)="applyFilters()">
+
+        <option value="">
+          All statuses
+        </option>
+
+        <option value="Saved">Saved</option>
+        <option value="Applied">Applied</option>
+        <option value="HRInterview">HR Interview</option>
+        <option value="TechnicalInterview">Technical Interview</option>
+        <option value="Offer">Offer</option>
+        <option value="Rejected">Rejected</option>
+        <option value="NoResponse">No Response</option>
+
+      </select>
+
+      <select
+        [(ngModel)]="technologyFilterId"
+        (change)="applyFilters()">
+
+        <option [ngValue]="null">
+          All technologies
+        </option>
+
+        @for (
+          technology of technologies;
+          track technology.id
+        ) {
+          <option [ngValue]="technology.id">
+            {{ technology.name }}
+          </option>
+        }
+
+      </select>
+
+
+      <button
+        type="button"
+        class="clear-filter-button"
+        (click)="clearFilters()">
+
+        Clear
+
+      </button>
+
+    </div>
+
+    @if (showForm) {
+
+      <div class="form-wrapper">
+
+        <div class="form-header">
+
+          <div>
+            @if (editingApplication) {
+              <h2>Edit Application</h2>
+              <p>Update the application details.</p>
+            } @else {
+              <h2>New Application</h2>
+              <p>Add a new opportunity to your tracker.</p>
+            }
+          </div>
+
+          <div class="header-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="closeForm()">
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              form="applicationForm"
+              class="save-button">
+
+              @if (editingApplication) {
+                Save Changes
+              } @else {
+                Add Application
+              }
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <form
+          id="applicationForm"
+          (ngSubmit)="onSubmit()">
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Company</label>
+
+              <input
+                type="text"
+                name="companyName"
+                [(ngModel)]="companyName"
+                placeholder="e.g. Microsoft"
+                required
+              />
+            </div>
+
+
+            <div class="form-group">
+              <label>Position</label>
+
+              <div class="position-autocomplete">
+
+                <input
+                  type="text"
+                  name="position"
+                  [(ngModel)]="position"
+                  (input)="onPositionInput()"
+                  (focus)="onPositionInput()"
+                  (blur)="hidePositionSuggestions()"
+                  placeholder="Start typing..."
+                  autocomplete="off"
+                  required
+                />
+
+                @if (
+                  showPositionSuggestions &&
+                  filteredPositions.length > 0
+                ) {
+
+                  <div class="position-suggestions">
+
+                    @for (
+                      suggestion of filteredPositions;
+                      track suggestion
+                    ) {
+
+                      <button
+                        type="button"
+                        class="position-suggestion"
+                        (mousedown)="
+                          selectPosition(suggestion);
+                          $event.preventDefault()
+                        ">
+                        {{ suggestion }}
+                      </button>
+
+                    }
+
+                  </div>
+                }
+
+              </div>
+            </div>
+
+
+            <div class="form-group">
+              <label>Location</label>
+
+              <input
+                type="text"
+                name="location"
+                [(ngModel)]="location"
+                placeholder="Belgrade / Remote"
+              />
+            </div>
+
+
+            <div class="form-group">
+              <label>Status</label>
+
+              <select
+                name="status"
+                [(ngModel)]="status">
+
+                <option value="Saved">
+                  Saved (Not Applied Yet)
+                </option>
+
+                <option value="Applied">
+                  Applied
+                </option>
+
+                <option value="HRInterview">
+                  HR Interview
+                </option>
+
+                <option value="TechnicalInterview">
+                  Technical Interview
+                </option>
+
+                <option value="Offer">
+                  Offer
+                </option>
+
+                <option value="Rejected">
+                  Rejected
+                </option>
+
+                <option value="NoResponse">
+                  No Response
+                </option>
+
+              </select>
+            </div>
+
+
+            <div class="form-group">
+              <label>Application Date</label>
+
+              <input
+                #applicationDateInput
+                type="date"
+                name="applicationDate"
+                [(ngModel)]="applicationDate"
+                (click)="applicationDateInput.showPicker()"
+                class="date-input"
+              />
+            </div>
+
+
+            <div class="form-group">
+              <label>Job URL</label>
+
+              <input
+                type="url"
+                name="jobUrl"
+                [(ngModel)]="jobUrl"
+                placeholder="https://..."
+              />
+            </div>
+
+          </div>
+
+
+          <div class="form-bottom">
+
+            <div class="form-group technologies-group">
+
+              <label>Required Technologies</label>
+
+              <div class="technology-selector">
+
+                @for (
+                  technology of technologies;
+                  track technology.id
+                ) {
+
+                  <button
+                    type="button"
+                    class="technology-option"
+                    [class.selected]="
+                      isTechnologySelected(technology.id)
+                    "
+                    (click)="
+                      toggleTechnology(technology.id)
+                    ">
+                    {{ technology.name }}
+                  </button>
+
+                }
+
+              </div>
+
+            </div>
+
+
+            <div class="form-group notes-group">
+
+              <label>Notes</label>
+
+              <textarea
+                name="notes"
+                [(ngModel)]="notes"
+                rows="2"
+                placeholder="Optional notes..."
+              ></textarea>
+
+            </div>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    }
+
+
+    @if (applications.length === 0) {
+
+      <div class="empty-state">
+        <h3>No applications yet</h3>
+
+        <p>
+          Add your first job application to start tracking it.
+        </p>
+      </div>
+
+    } @else {
+
+      <div class="applications-grid">
+
+        @for (
+          application of applications;
+          track application.id
+        ) {
+
+          <article class="application-card">
+
+            <div class="card-top">
+
+              <div class="company-info">
+                <h2>{{ application.companyName }}</h2>
+
+                <p class="position">
+                  {{ application.position }}
+                </p>
+              </div>
+
+
+              <div class="card-controls">
+
+                <span class="status">
+                  {{ getStatusLabel(application.status) }}
+                </span>
+
+                <button
+                  type="button"
+                  class="icon-button"
+                  title="Edit application"
+                  aria-label="Edit application"
+                  (click)="openEditForm(application)">
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+                    <path
+                      d="M12 20h9"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+
+                </button>
+
+
+                <button
+                  type="button"
+                  class="icon-button delete-icon"
+                  title="Delete application"
+                  aria-label="Delete application"
+                  (click)="
+                    deleteApplication(application.id)
+                  ">
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+                    <path
+                      d="M3 6h18"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M8 6V4h8v2M19 6l-1 14H6L5 6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M10 11v5M14 11v5"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            @if (application.technologies?.length > 0) {
+
+              <div class="technology-tags">
+
+                @for (
+                  technology of application.technologies;
+                  track technology.id
+                ) {
+                  <span class="technology-tag">
+                    {{ technology.name }}
+                  </span>
+                }
+
+              </div>
+
+            }
+
+
+            <div class="card-details">
+
+              <div class="detail-item">
+                <span class="detail-label">
+                  Location
+                </span>
+
+                <span class="detail-value">
+                  {{
+                    application.location ||
+                    'Not specified'
+                  }}
+                </span>
+              </div>
+
+
+              <div class="detail-item">
+                <span class="detail-label">
+                  Applied
+                </span>
+
+                <span class="detail-value">
+                  {{
+                    formatDate(
+                      application.applicationDate
+                    )
+                  }}
+                </span>
+              </div>
+
+
+              @if (application.jobUrl) {
+
+                <div class="detail-item">
+                  <span class="detail-label">
+                    Job offer
+                  </span>
+
+                  <a
+                    class="job-link"
+                    [href]="application.jobUrl"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    View job ad →
+                  </a>
+                </div>
+
+              }
+
+            </div>
+
+
+            @if (application.notes) {
+
+              <div class="notes">
+                <span class="detail-label">
+                  Notes
+                </span>
+
+                <p>
+                  {{ application.notes }}
+                </p>
+              </div>
+
+            }
+
+          </article>
+
+        }
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

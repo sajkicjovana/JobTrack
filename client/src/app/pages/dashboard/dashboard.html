@@ -1,0 +1,504 @@
+<div class="dashboard-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+
+      <p>
+        Overview of your job search
+        and interview preparation.
+      </p>
+    </div>
+  </div>
+
+
+  @if (loading) {
+
+    <div class="message">
+      Loading dashboard...
+    </div>
+
+  } @else if (errorMessage) {
+
+    <div class="message error">
+      {{ errorMessage }}
+    </div>
+
+  } @else {
+
+
+    <!-- STATISTICS -->
+
+    <div class="stats-grid">
+
+      <a
+        routerLink="/applications"
+        class="stat-card">
+
+        <span class="stat-label">
+          Applications
+        </span>
+
+        <strong>
+          {{ applicationsCount }}
+        </strong>
+
+        <span class="stat-link">
+          View applications →
+        </span>
+
+      </a>
+
+
+      <a
+        routerLink="/interviews"
+        class="stat-card">
+
+        <span class="stat-label">
+          Upcoming Interviews
+        </span>
+
+        <strong>
+          {{ upcomingInterviewsCount }}
+        </strong>
+
+        <span class="stat-link">
+          View interviews →
+        </span>
+
+      </a>
+
+
+      <a
+        routerLink="/preparation"
+        class="stat-card">
+
+        <span class="stat-label">
+          Tests Completed
+        </span>
+
+        <strong>
+          {{ testsCompleted }}
+        </strong>
+
+        <span class="stat-link">
+          Practice →
+        </span>
+
+      </a>
+
+
+      <a
+        routerLink="/preparation"
+        class="stat-card">
+
+        <span class="stat-label">
+          Average Score
+        </span>
+
+        <strong>
+          {{ formatPercentage(averageScore) }}
+        </strong>
+
+        <span class="stat-link">
+          View results →
+        </span>
+
+      </a>
+
+    </div>
+
+
+    <div class="dashboard-grid">
+
+
+      <!-- UPCOMING INTERVIEWS -->
+
+      <section class="dashboard-section">
+
+        <div class="section-header">
+
+          <div>
+            <h2>
+              Upcoming Interviews
+            </h2>
+
+            <p>
+              Your next scheduled interviews.
+            </p>
+          </div>
+
+
+          <a routerLink="/interviews">
+            View all →
+          </a>
+
+        </div>
+
+
+        @if (
+          upcomingInterviews.length === 0
+        ) {
+
+          <div class="empty-state">
+            No upcoming interviews.
+          </div>
+
+        } @else {
+
+          <div class="item-list">
+
+            @for (
+              interview
+              of upcomingInterviews.slice(0, 3);
+              track interview.id
+            ) {
+
+              <div class="list-item">
+
+                <div>
+
+                  <h3>
+                    {{ interview.companyName }}
+                  </h3>
+
+                  <p>
+                    {{ interview.position }}
+                  </p>
+
+                  <span class="item-meta">
+                    {{ interview.type }}
+                  </span>
+
+                </div>
+
+
+                <div class="item-date">
+
+                  {{
+                    interview.interviewDate
+                      | date:'dd/MM/yyyy'
+                  }}
+
+                  <span>
+                    {{
+                      interview.interviewDate
+                        | date:'HH:mm'
+                    }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
+
+
+      <!-- RECENT TEST RESULTS -->
+
+      <section class="dashboard-section">
+
+        <div class="section-header">
+
+          <div>
+            <h2>
+              Recent Test Results
+            </h2>
+
+            <p>
+              Your latest completed tests.
+            </p>
+          </div>
+
+
+          <a routerLink="/preparation">
+            View all →
+          </a>
+
+        </div>
+
+
+        @if (
+          recentResults.length === 0
+        ) {
+
+          <div class="empty-state">
+            You have not completed
+            any tests yet.
+          </div>
+
+        } @else {
+
+          <div class="item-list">
+
+            @for (
+              result of recentResults;
+              track result.attemptId
+            ) {
+
+              <a
+                class="list-item result-item"
+                [routerLink]="[
+                  '/test-result',
+                  result.attemptId
+                ]">
+
+                <div>
+
+                  <h3>
+                    {{ result.testTitle }}
+                  </h3>
+
+                  <p>
+                    {{ result.technologyName }}
+                  </p>
+
+                  <span class="item-meta">
+                    {{
+                      result.completedAt
+                        | date:'dd/MM/yyyy'
+                    }}
+                  </span>
+
+                </div>
+
+
+                <div class="result-score">
+
+                  <strong>
+                    {{ formatPercentage(result.percentage) }}
+                  </strong>
+
+                  <span>
+                    {{
+                      result.correctAnswers
+                    }}/{{ result.totalQuestions }}
+                  </span>
+
+                </div>
+
+              </a>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
+    </div>
+
+    <section class="progress-section">
+
+      <div class="section-header">
+
+        <div>
+          <h2>Preparation Progress</h2>
+
+          <p>
+            Your progress by technology
+            based on completed tests.
+          </p>
+        </div>
+
+        <a routerLink="/preparation">
+          Practice →
+        </a>
+
+      </div>
+
+
+      @if (technologyProgress.length === 0) {
+
+        <div class="empty-state">
+          No preparation progress yet.
+        </div>
+
+      } @else {
+
+        <div class="progress-list">
+
+          @for (
+            technology of technologyProgress;
+            track technology.technologyName
+          ) {
+
+            <div class="progress-item">
+
+              <div class="progress-info">
+
+                <div>
+
+                  <strong>
+                    {{ technology.technologyName }}
+                  </strong>
+
+                  <span>
+                    {{ technology.testsCompleted }}
+                    completed
+                    {{
+                      technology.testsCompleted === 1
+                        ? 'test'
+                        : 'tests'
+                    }}
+                  </span>
+
+                </div>
+
+                <strong class="progress-score">
+                  {{ formatPercentage(technology.score) }}
+                </strong>
+
+              </div>
+
+
+              <div class="progress-bar">
+
+                <div
+                  class="progress-value"
+                  [style.width.%]="technology.score">
+                </div>
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <section class="readiness-section">
+
+      <div class="section-header">
+
+        <div>
+
+          <h2>Job Readiness</h2>
+
+          <p>
+            Your preparation level for
+            each job application.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      @if (applicationReadiness.length === 0) {
+
+        <div class="empty-state">
+          You do not have any
+          job applications yet.
+        </div>
+
+      } @else {
+
+        <div class="readiness-grid">
+
+          @for (
+            application of applicationReadiness;
+            track application.applicationId
+          ) {
+
+            <div class="readiness-card">
+
+              <div class="readiness-header">
+
+                <div>
+
+                  <h3>
+                    {{ application.companyName }}
+                  </h3>
+
+                  <p>
+                    {{ application.position }}
+                  </p>
+
+                </div>
+
+
+                @if (application.score !== null) {
+
+                  <div class="readiness-score">
+                    {{ formatPercentage(application.score) }}
+                  </div>
+
+                }
+
+              </div>
+
+
+              @if (application.score === null) {
+
+                <div class="no-technologies">
+
+                  No technologies were added
+                  to this application.
+
+                </div>
+
+              } @else {
+
+                <div class="readiness-progress">
+
+                  <div
+                    class="readiness-progress-value"
+                    [style.width.%]="application.score">
+                  </div>
+
+                </div>
+
+
+                <div class="technology-scores">
+
+                  @for (
+                    technology
+                    of application.technologies;
+                    track technology.name
+                  ) {
+
+                    <div class="technology-score">
+
+                      <span>
+                        {{ technology.name }}
+                      </span>
+
+                      <strong>
+                        {{ formatPercentage(technology.score) }}
+                      </strong>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              }
+
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+  }
+
+</div>

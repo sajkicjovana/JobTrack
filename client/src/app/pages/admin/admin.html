@@ -1,0 +1,838 @@
+<div class="admin-page">
+
+  <div class="admin-container">
+
+    <div class="page-header">
+      <div>
+        <h1>Admin Panel</h1>
+        <p>
+          Manage technologies, topics, questions and tests.
+        </p>
+      </div>
+    </div>
+
+
+    <div class="tabs">
+
+      <button
+        [class.active]="activeTab === 'technologies'"
+        (click)="setTab('technologies')">
+        Technologies
+      </button>
+
+      <button
+        [class.active]="activeTab === 'topics'"
+        (click)="setTab('topics')">
+        Topics
+      </button>
+
+      <button
+        [class.active]="activeTab === 'questions'"
+        (click)="setTab('questions')">
+        Questions
+      </button>
+
+      <button
+        [class.active]="activeTab === 'tests'"
+        (click)="setTab('tests')">
+        Tests
+      </button>
+
+    </div>
+
+
+    <!-- TECHNOLOGIES -->
+
+    @if (activeTab === 'technologies') {
+
+      <section class="admin-section">
+
+        <div class="section-header">
+          <div>
+            <h2>Technologies</h2>
+            <p>
+              Technologies used in job applications and preparation.
+            </p>
+          </div>
+        </div>
+
+
+        <div class="simple-form">
+
+          <input
+            type="text"
+            [(ngModel)]="technologyName"
+            placeholder="Technology name"
+          />
+
+          @if (editingTechnologyId) {
+            <button
+              class="secondary-button"
+              (click)="resetTechnologyForm()">
+              Cancel
+            </button>
+          }
+
+          <button
+            class="primary-button"
+            (click)="saveTechnology()">
+
+            {{
+              editingTechnologyId
+                ? 'Save Changes'
+                : 'Add Technology'
+            }}
+
+          </button>
+
+        </div>
+
+
+        <div class="item-grid">
+
+          @for (
+            technology of technologies;
+            track technology.id
+          ) {
+
+            <div class="small-card">
+
+              <span>
+                {{ technology.name }}
+              </span>
+
+              <div class="item-actions">
+
+                <button
+                  class="icon-button"
+                  (click)="editTechnology(technology)">
+                  ✎
+                </button>
+
+                <button
+                  class="icon-button delete"
+                  (click)="deleteTechnology(technology.id)">
+                  🗑
+                </button>
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+
+    <!-- TOPICS -->
+
+    @if (activeTab === 'topics') {
+
+      <section class="admin-section">
+
+        <div class="section-header">
+          <div>
+            <h2>Topics</h2>
+            <p>
+              Create preparation areas and theory for each technology.
+            </p>
+          </div>
+        </div>
+
+
+        <div class="topic-form">
+
+          <div class="topic-field">
+            <label>Technology</label>
+
+            <select [(ngModel)]="topicTechnologyId">
+              <option
+                [ngValue]="null"
+                disabled>
+                Select technology
+              </option>
+
+              @for (
+                technology of technologies;
+                track technology.id
+              ) {
+                <option [ngValue]="technology.id">
+                  {{ technology.name }}
+                </option>
+              }
+            </select>
+          </div>
+
+
+          <div class="topic-field">
+            <label>Topic name</label>
+
+            <input
+              type="text"
+              [(ngModel)]="topicName"
+              placeholder="e.g. Components and Templates"
+            />
+          </div>
+
+
+          <div class="topic-top-actions">
+
+            @if (editingTopicId) {
+              <button
+                class="secondary-button"
+                (click)="resetTopicForm()">
+                Cancel
+              </button>
+            }
+
+            <button
+              class="primary-button"
+              (click)="saveTopic()">
+
+              {{
+                editingTopicId
+                  ? 'Save Changes'
+                  : 'Add Topic'
+              }}
+
+            </button>
+
+          </div>
+
+
+          <div class="topic-field theory-field">
+            <label>Theory content</label>
+
+            <textarea
+              [(ngModel)]="topicContent"
+              rows="4"
+              placeholder="Write the study material here..."
+            ></textarea>
+          </div>
+
+        </div>
+        
+        <select
+          class="admin-filter"
+          [(ngModel)]="topicFilterTechnologyId">
+
+          <option [ngValue]="null">
+            All technologies
+          </option>
+
+          @for (
+            technology of technologies;
+            track technology.id
+          ) {
+            <option [ngValue]="technology.id">
+              {{ technology.name }}
+            </option>
+          }
+
+        </select>
+
+
+        <div class="list">
+
+          @for (
+            topic of filteredAdminTopics;
+            track topic.id
+          ) {
+
+            <div class="list-item">
+
+              <div>
+                <strong>
+                  {{ topic.name }}
+                </strong>
+
+                <span>
+                  {{ topic.technologyName }}
+                  ·
+                  {{ topic.questionCount }}
+                  {{
+                    topic.questionCount === 1
+                      ? 'question'
+                      : 'questions'
+                  }}
+                </span>
+
+                @if (topic.content) {
+                  <p class="topic-preview">
+                    {{ topic.content }}
+                  </p>
+                }
+              </div>
+
+
+              <div class="item-actions">
+
+                <button
+                  class="icon-button"
+                  (click)="editTopic(topic)">
+                  ✎
+                </button>
+
+                <button
+                  class="icon-button delete"
+                  (click)="deleteTopic(topic.id)">
+                  🗑
+                </button>
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+
+    <!-- QUESTIONS -->
+
+    @if (activeTab === 'questions') {
+
+      <section class="admin-section">
+
+        <div class="section-header">
+          <div>
+            <h2>Questions</h2>
+            <p>
+              Create single-choice questions and define the correct answer.
+            </p>
+          </div>
+        </div>
+
+
+        <div class="question-form">
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label>Technology</label>
+
+              <select
+                [(ngModel)]="questionTechnologyId"
+                (ngModelChange)="onQuestionTechnologyChange()">
+
+                <option
+                  [ngValue]="null"
+                  disabled>
+                  Select technology
+                </option>
+
+                @for (
+                  technology of technologies;
+                  track technology.id
+                ) {
+                  <option [ngValue]="technology.id">
+                    {{ technology.name }}
+                  </option>
+                }
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Topic</label>
+
+              <select
+                [(ngModel)]="questionTopicId">
+
+                <option
+                  [ngValue]="null"
+                  disabled>
+                  Select topic
+                </option>
+
+                @for (
+                  topic of getQuestionTopics();
+                  track topic.id
+                ) {
+                  <option [ngValue]="topic.id">
+                    {{ topic.name }}
+                  </option>
+                }
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>Question</label>
+
+            <textarea
+              [(ngModel)]="questionText"
+              rows="2"
+              placeholder="Enter question text..."
+            ></textarea>
+
+          </div>
+
+
+          <div class="answers-header">
+
+            <strong>Answers</strong>
+
+            <button
+              class="text-button"
+              (click)="addAnswer()">
+              + Add answer
+            </button>
+
+          </div>
+
+
+          <div class="answers-list">
+
+            @for (
+              answer of answers;
+              track $index;
+              let i = $index
+            ) {
+
+              <div class="answer-row">
+
+                <input
+                  type="radio"
+                  name="correctAnswer"
+                  [checked]="answer.isCorrect"
+                  (change)="setCorrectAnswer(i)"
+                />
+
+                <input
+                  type="text"
+                  [(ngModel)]="answer.text"
+                  placeholder="Answer option"
+                />
+
+                <button
+                  class="remove-answer"
+                  type="button"
+                  [disabled]="answers.length <= 2"
+                  (click)="removeAnswer(i)">
+                  ×
+                </button>
+
+              </div>
+
+            }
+
+          </div>
+
+
+          <div class="form-actions">
+
+            @if (editingQuestionId) {
+
+              <button
+                class="secondary-button"
+                (click)="resetQuestionForm()">
+                Cancel
+              </button>
+
+            }
+
+            <button
+              class="primary-button"
+              (click)="saveQuestion()">
+
+              {{
+                editingQuestionId
+                  ? 'Save Changes'
+                  : 'Create Question'
+              }}
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <select
+          class="admin-filter"
+          [(ngModel)]="questionFilterTechnologyId">
+
+          <option [ngValue]="null">
+            All technologies
+          </option>
+
+          @for (
+            technology of technologies;
+            track technology.id
+          ) {
+            <option [ngValue]="technology.id">
+              {{ technology.name }}
+            </option>
+          }
+
+        </select>
+
+
+        <div class="question-list">
+
+          @for (
+            question of filteredAdminQuestions;
+            track question.id
+          ) {
+
+            <div class="question-card">
+
+              <div class="question-top">
+
+                <div>
+                  <span class="technology-badge">
+                    {{ question.technologyName }}
+                  </span>
+
+                  <span class="topic-badge">
+                    {{ question.topicName }}
+                  </span>
+                </div>
+
+
+                <div class="item-actions">
+
+                  <button
+                    class="icon-button"
+                    (click)="editQuestion(question)">
+                    ✎
+                  </button>
+
+                  <button
+                    class="icon-button delete"
+                    (click)="deleteQuestion(question.id)">
+                    🗑
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              <h3>
+                {{ question.text }}
+              </h3>
+
+
+              <div class="answer-preview">
+
+                @for (
+                  answer of question.answers;
+                  track answer.id
+                ) {
+
+                  <span
+                    [class.correct]="answer.isCorrect">
+                    {{ answer.text }}
+                  </span>
+
+                }
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+
+    <!-- TESTS -->
+
+    @if (activeTab === 'tests') {
+
+      <section class="admin-section">
+
+        <div class="section-header">
+          <div>
+            <h2>Tests</h2>
+            <p>
+              Build tests from the question bank and publish them to users.
+            </p>
+          </div>
+        </div>
+
+
+        <div class="test-form">
+
+          <div class="form-row">
+
+            <div class="form-group">
+
+              <label>Title</label>
+
+              <input
+                type="text"
+                [(ngModel)]="testTitle"
+                placeholder="e.g. SQL Basics"
+              />
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Technology</label>
+
+              <select
+                [(ngModel)]="testTechnologyId"
+                (ngModelChange)="onTestTechnologyChange()">
+
+                <option
+                  [ngValue]="null"
+                  disabled>
+                  Select technology
+                </option>
+
+                @for (
+                  technology of technologies;
+                  track technology.id
+                ) {
+                  <option [ngValue]="technology.id">
+                    {{ technology.name }}
+                  </option>
+                }
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>Description</label>
+
+            <textarea
+              [(ngModel)]="testDescription"
+              rows="2"
+              placeholder="Optional description..."
+            ></textarea>
+
+          </div>
+
+
+          @if (testTechnologyId) {
+
+            <div class="question-selector">
+
+              <label>
+                Select Questions
+              </label>
+
+
+              @if (getQuestionsForTest().length === 0) {
+
+                <p class="muted">
+                  There are no questions for this technology yet.
+                </p>
+
+              }
+
+
+              @for (
+                question of getQuestionsForTest();
+                track question.id
+              ) {
+
+                <label class="question-option">
+
+                  <input
+                    type="checkbox"
+                    [checked]="isQuestionSelected(question.id)"
+                    (change)="toggleTestQuestion(question.id)"
+                  />
+
+                  <span>
+
+                    <strong>
+                      {{ question.topicName }}
+                    </strong>
+
+                    {{ question.text }}
+
+                  </span>
+
+                </label>
+
+              }
+
+            </div>
+
+          }
+
+
+          <div class="form-actions">
+
+            @if (editingTestId) {
+
+              <button
+                class="secondary-button"
+                (click)="resetTestForm()">
+                Cancel
+              </button>
+
+            }
+
+
+            <button
+              class="primary-button"
+              (click)="saveTest()">
+
+              {{
+                editingTestId
+                  ? 'Save Changes'
+                  : 'Create Test'
+              }}
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <select
+          class="admin-filter"
+          [(ngModel)]="testFilterTechnologyId">
+
+          <option [ngValue]="null">
+            All technologies
+          </option>
+
+          @for (
+            technology of technologies;
+            track technology.id
+          ) {
+            <option [ngValue]="technology.id">
+              {{ technology.name }}
+            </option>
+          }
+
+        </select>
+
+
+        <div class="tests-grid">
+
+          @for (
+            test of filteredAdminTests;
+            track test.id
+          ) {
+
+            <div class="test-card">
+
+              <div class="test-top">
+
+                <div>
+                  <span class="technology-badge">
+                    {{ test.technologyName }}
+                  </span>
+
+                  <span
+                    class="status-badge"
+                    [class.published]="test.isPublished">
+
+                    {{
+                      test.isPublished
+                        ? 'Published'
+                        : 'Draft'
+                    }}
+
+                  </span>
+                </div>
+
+              </div>
+
+
+              <h3>
+                {{ test.title }}
+              </h3>
+
+
+              @if (test.description) {
+                <p>
+                  {{ test.description }}
+                </p>
+              }
+
+
+              <span class="question-count">
+                {{ test.questionCount }}
+                {{
+                  test.questionCount === 1
+                    ? 'question'
+                    : 'questions'
+                }}
+              </span>
+
+
+              <div class="test-actions">
+
+                @if (!test.isPublished) {
+
+                  <button
+                    class="secondary-button"
+                    (click)="editTest(test)">
+                    Edit
+                  </button>
+
+                  <button
+                    class="primary-button"
+                    (click)="publishTest(test.id)">
+                    Publish
+                  </button>
+
+                  <button
+                    class="danger-button"
+                    (click)="deleteTest(test.id)">
+                    Delete
+                  </button>
+
+                } @else {
+
+                  <button
+                    class="secondary-button"
+                    (click)="unpublishTest(test.id)">
+                    Unpublish
+                  </button>
+
+                }
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+  </div>
+
+</div>

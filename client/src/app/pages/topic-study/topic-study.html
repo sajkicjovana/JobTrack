@@ -1,0 +1,84 @@
+<div class="topic-study-page">
+
+  <div class="study-container">
+
+    <a
+      routerLink="/preparation"
+      class="back-link">
+      ← Back to Preparation
+    </a>
+
+
+    @if (loading) {
+
+      <div class="study-message">
+        Loading study material...
+      </div>
+
+    } @else if (errorMessage) {
+
+      <div class="study-message">
+        {{ errorMessage }}
+      </div>
+
+    } @else if (topic) {
+
+      <header class="study-header">
+
+        <span class="technology-badge">
+          {{ topic.technologyName }}
+        </span>
+
+        <h1>
+          {{ topic.name }}
+        </h1>
+
+        <p>
+          Study the material below and then
+          test your knowledge.
+        </p>
+
+      </header>
+
+
+      <article
+        class="theory-content"
+        [innerHTML]="contentHtml">
+      </article>
+
+
+      <div class="study-footer">
+
+        <div>
+
+          <h2>
+            Ready to practice?
+          </h2>
+
+          <p>
+            Continue with tests for
+            {{ topic.technologyName }}.
+          </p>
+
+        </div>
+
+
+        <a
+          routerLink="/preparation"
+          [queryParams]="{
+            technology:
+              topic.technologyName
+          }"
+          class="practice-button">
+
+          Practice tests →
+
+        </a>
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

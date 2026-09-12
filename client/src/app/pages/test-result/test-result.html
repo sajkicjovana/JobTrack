@@ -1,0 +1,111 @@
+<div class="result-page">
+
+  <div class="result-container">
+
+    @if (result) {
+
+      <div class="result-summary">
+
+        <span class="technology">
+          {{ result.technologyName }}
+        </span>
+
+        <h1>
+          {{ result.testTitle }}
+        </h1>
+
+        <div class="score">
+          {{ getPercentage() }}%
+        </div>
+
+        <p>
+          You answered
+          <strong>
+            {{ result.correctAnswers }}
+          </strong>
+          out of
+          <strong>
+            {{ result.totalQuestions }}
+          </strong>
+          questions correctly.
+        </p>
+
+      </div>
+
+
+      <div class="review">
+
+        <h2>Review</h2>
+
+
+        @for (
+          answer of result.answers;
+          track answer.questionId
+        ) {
+
+          <div
+            class="review-card"
+            [class.correct]="answer.isCorrect"
+            [class.incorrect]="!answer.isCorrect">
+
+            <div class="review-top">
+
+              <span>
+                {{ answer.topicName }}
+              </span>
+
+              <strong>
+                {{
+                  answer.isCorrect
+                    ? 'Correct'
+                    : 'Incorrect'
+                }}
+              </strong>
+
+            </div>
+
+
+            <h3>
+              {{ answer.questionText }}
+            </h3>
+
+
+            <p>
+              <span>Your answer:</span>
+
+              {{
+                answer.selectedAnswer ||
+                'No answer'
+              }}
+            </p>
+
+
+            @if (!answer.isCorrect) {
+
+              <p>
+                <span>Correct answer:</span>
+
+                {{ answer.correctAnswer }}
+              </p>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <button
+        type="button"
+        class="back-button"
+        (click)="backToPreparation()">
+        Back to Preparation
+      </button>
+
+    }
+
+  </div>
+
+</div>

@@ -1,0 +1,362 @@
+<div class="preparation-page">
+
+  <div class="page-container">
+
+    <div class="page-header">
+
+      <div>
+
+        <h1>
+          Interview Preparation
+        </h1>
+
+        <p>
+          Study important topics and practice
+          technologies required for your job applications.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="technology-filters main-filters">
+
+      @for (
+        technology of technologies;
+        track technology
+      ) {
+
+        <button
+          type="button"
+          class="technology-filter"
+          [class.active]="
+            selectedTechnology === technology
+          "
+          (click)="selectTechnology(technology)"
+        >
+          {{ technology }}
+        </button>
+
+      }
+
+    </div>
+
+
+    <section class="section">
+
+      <div class="section-header">
+
+        <div>
+
+          <h2>
+            Study Materials
+          </h2>
+
+          <p>
+            Review the theory before testing
+            your knowledge.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      @if (filteredTopics.length === 0) {
+
+        <div class="empty-state">
+          No study materials available.
+        </div>
+
+      } @else {
+
+        <div class="study-grid">
+
+          @for (
+            topic of filteredTopics;
+            track topic.id
+          ) {
+
+            <article class="study-card">
+
+              <span class="technology-badge">
+                {{ topic.technologyName }}
+              </span>
+
+
+              <h3>
+                {{ topic.name }}
+              </h3>
+
+
+              <p>
+                {{ topic.questionCount }}
+
+                {{
+                  topic.questionCount === 1
+                    ? 'practice question'
+                    : 'practice questions'
+                }}
+              </p>
+
+
+              <button
+                type="button"
+                class="study-button"
+                (click)="openTopic(topic.id)"
+              >
+                Study Topic →
+              </button>
+
+            </article>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="section-header">
+
+        <div>
+
+          <h2>
+            Available Tests
+          </h2>
+
+          <p>
+            Choose a test and check your knowledge.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      @if (tests.length === 0) {
+
+        <div class="empty-state">
+
+          <h3>
+            No tests available
+          </h3>
+
+          <p>
+            Published tests will appear here.
+          </p>
+
+        </div>
+
+      } @else {
+
+        <div class="test-filters">
+
+          <input
+            type="text"
+            class="search-input"
+            [(ngModel)]="searchTerm"
+            placeholder="Search tests..."
+          />
+
+        </div>
+
+
+        @if (filteredTests.length === 0) {
+
+          <div class="empty-state">
+            No tests found.
+          </div>
+
+        } @else {
+
+          @for (
+            group of groupedTests;
+            track group.technologyName
+          ) {
+
+            <div class="technology-group">
+
+              <div class="technology-group-header">
+
+                <h3>
+                  {{ group.technologyName }}
+                </h3>
+
+                <span>
+
+                  {{ group.tests.length }}
+
+                  {{
+                    group.tests.length === 1
+                      ? 'test'
+                      : 'tests'
+                  }}
+
+                </span>
+
+              </div>
+
+
+              <div class="tests-grid">
+
+                @for (
+                  test of group.tests;
+                  track test.id
+                ) {
+
+                  <article
+                    class="test-card"
+                    [id]="'test-' + test.id"
+                    [class.highlighted-test]="
+                      highlightedTestId === test.id
+                    "
+                  >
+
+                    <div class="test-top">
+
+                      <span class="technology-badge">
+                        {{ test.technologyName }}
+                      </span>
+
+                      <span class="question-count">
+
+                        {{ test.questionCount }}
+
+                        {{
+                          test.questionCount === 1
+                            ? 'question'
+                            : 'questions'
+                        }}
+
+                      </span>
+
+                    </div>
+
+
+                    <h3>
+                      {{ test.title }}
+                    </h3>
+
+
+                    @if (test.description) {
+
+                      <p class="description">
+                        {{ test.description }}
+                      </p>
+
+                    }
+
+
+                    <button
+                      type="button"
+                      class="start-button"
+                      (click)="startTest(test.id)"
+                    >
+                      Start Test →
+                    </button>
+
+                  </article>
+
+                }
+
+              </div>
+
+            </div>
+
+          }
+
+        }
+
+      }
+
+    </section>
+
+
+    <section class="section results-section">
+
+      <div class="section-header">
+
+        <div>
+
+          <h2>
+            Previous Results
+          </h2>
+
+          <p>
+            Your completed tests and scores.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      @if (results.length === 0) {
+
+        <div class="empty-results">
+          You have not completed any tests yet.
+        </div>
+
+      } @else {
+
+        <div class="results-list">
+
+          @for (
+            result of results;
+            track result.id
+          ) {
+
+            <div class="result-row">
+
+              <div>
+
+                <strong>
+                  {{ result.testTitle }}
+                </strong>
+
+                <span>
+                  {{ result.technologyName }}
+                  ·
+                  {{ formatDate(result.completedAt) }}
+                </span>
+
+              </div>
+
+
+              <div class="result-score">
+
+                <strong>
+                  {{
+                    result.correctAnswers
+                  }}/{{ result.totalQuestions }}
+                </strong>
+
+                <span>
+                  {{
+                    formatPercentage(
+                      result.percentage
+                    )
+                  }}
+                </span>
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+  </div>
+
+</div>
