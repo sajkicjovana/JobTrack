@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<defs>
+  <filter id="s" x="-10%" y="-10%" width="120%" height="120%">
+    <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".12"/>
+  </filter>
+  <marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+    <path d="M0,0 L10,5 L0,10 Z" fill="#44546a"/>
+  </marker>
+  <style>
+    .t{font:700 34px Arial,sans-serif;fill:#10243e}
+    .st{font:17px Arial,sans-serif;fill:#516176}
+    .h{font:700 23px Arial,sans-serif;fill:#10243e}
+    .b{font:16px Arial,sans-serif;fill:#24364d}
+    .sm{font:14px Arial,sans-serif;fill:#516176}
+    .lab{font:700 14px Arial,sans-serif;fill:#40516a}
+  </style>
+</defs>
+
+<rect width="1600" height="900" fill="#f4f7fb"/>
+<text x="800" y="58" text-anchor="middle" class="t">JobTrack - System Architecture</text>
+<text x="800" y="88" text-anchor="middle" class="st">Angular 20 SPA • ASP.NET Core Web API (.NET 9) • PostgreSQL • SignalR • Selenium POM</text>
+
+<!-- Frontend -->
+<rect x="85" y="155" width="390" height="390" rx="18" fill="#eef5ff" stroke="#4f8ef7" stroke-width="2.5" filter="url(#s)"/>
+<text x="280" y="200" text-anchor="middle" class="h">Frontend Layer</text>
+<text x="280" y="228" text-anchor="middle" class="st">Angular 20 client application</text>
+<line x1="120" y1="250" x2="440" y2="250" stroke="#c1d5ef"/>
+<text x="125" y="290" class="b">• TypeScript + SCSS</text>
+<text x="125" y="323" class="b">• Angular Forms and Router</text>
+<text x="125" y="356" class="b">• Dashboard, Applications, Interviews</text>
+<text x="125" y="389" class="b">• Preparation and Admin Panel</text>
+<text x="125" y="422" class="b">• SignalR client</text>
+<text x="125" y="455" class="b">• Marked for study materials</text>
+<rect x="120" y="480" width="320" height="42" rx="10" fill="#fff" stroke="#c1d5ef"/>
+<text x="280" y="507" text-anchor="middle" class="sm">http://localhost:4200</text>
+
+<!-- Backend -->
+<rect x="605" y="135" width="400" height="450" rx="18" fill="#eefaf7" stroke="#2fa67b" stroke-width="2.5" filter="url(#s)"/>
+<text x="805" y="180" text-anchor="middle" class="h">Backend Layer</text>
+<text x="805" y="208" text-anchor="middle" class="st">ASP.NET Core Web API • .NET 9</text>
+
+<rect x="640" y="245" width="330" height="65" rx="10" fill="#fff" stroke="#cae5dc"/>
+<text x="805" y="273" text-anchor="middle" class="lab">REST Controllers</text>
+<text x="805" y="297" text-anchor="middle" class="sm">Auth • Applications • Interviews • Preparation • Admin</text>
+
+<rect x="640" y="326" width="330" height="60" rx="10" fill="#fff" stroke="#cae5dc"/>
+<text x="805" y="352" text-anchor="middle" class="lab">Authentication &amp; Authorization</text>
+<text x="805" y="375" text-anchor="middle" class="sm">JWT • User/Admin roles • ownership checks</text>
+
+<rect x="640" y="402" width="330" height="60" rx="10" fill="#fff" stroke="#cae5dc"/>
+<text x="805" y="428" text-anchor="middle" class="lab">SignalR</text>
+<text x="805" y="451" text-anchor="middle" class="sm">real-time publish / unpublish notifications</text>
+
+<rect x="640" y="478" width="330" height="60" rx="10" fill="#fff" stroke="#cae5dc"/>
+<text x="805" y="504" text-anchor="middle" class="lab">Data Access</text>
+<text x="805" y="527" text-anchor="middle" class="sm">Entity Framework Core + migrations</text>
+
+<text x="805" y="568" text-anchor="middle" class="sm">http://localhost:5254</text>
+
+<!-- Data -->
+<rect x="1130" y="155" width="385" height="390" rx="18" fill="#f5f9e8" stroke="#91aa3b" stroke-width="2.5" filter="url(#s)"/>
+<text x="1322" y="200" text-anchor="middle" class="h">Data Layer</text>
+<text x="1322" y="228" text-anchor="middle" class="st">PostgreSQL relational database</text>
+<line x1="1165" y1="250" x2="1480" y2="250" stroke="#dce7ac"/>
+<text x="1170" y="290" class="b">Main entities:</text>
+<text x="1190" y="323" class="sm">• User</text>
+<text x="1190" y="352" class="sm">• JobApplication + Technology</text>
+<text x="1190" y="381" class="sm">• Interview</text>
+<text x="1190" y="410" class="sm">• Topic + Question + AnswerOption</text>
+<text x="1190" y="439" class="sm">• Test + TestQuestion</text>
+<text x="1190" y="468" class="sm">• TestAttempt + TestAnswer</text>
+<rect x="1165" y="490" width="315" height="36" rx="9" fill="#fff" stroke="#dce7ac"/>
+<text x="1322" y="513" text-anchor="middle" class="sm">EF Core migrations manage the schema</text>
+
+<!-- Auth -->
+<rect x="170" y="660" width="440" height="165" rx="18" fill="#fff5ea" stroke="#d78b32" stroke-width="2.5" filter="url(#s)"/>
+<text x="390" y="702" text-anchor="middle" class="h">Authentication &amp; Authorization</text>
+<text x="205" y="741" class="b">• JWT-based authentication</text>
+<text x="205" y="772" class="b">• Roles: User and Admin</text>
+<text x="205" y="803" class="b">• Protected actions and per-user ownership</text>
+
+<!-- Testing -->
+<rect x="990" y="660" width="440" height="165" rx="18" fill="#f2f0ff" stroke="#7868cf" stroke-width="2.5" filter="url(#s)"/>
+<text x="1210" y="702" text-anchor="middle" class="h">Quality &amp; Automation</text>
+<text x="1025" y="741" class="b">• Java + TestNG</text>
+<text x="1025" y="772" class="b">• Selenium WebDriver + WebDriverManager</text>
+<text x="1025" y="803" class="b">• Maven + Page Object Model • 7 tests</text>
+
+<!-- Arrows -->
+<line x1="475" y1="330" x2="605" y2="330" stroke="#44546a" stroke-width="3" marker-end="url(#a)"/>
+<text x="540" y="312" text-anchor="middle" class="lab">HTTP / REST + JSON</text>
+
+<line x1="1005" y1="330" x2="1130" y2="330" stroke="#44546a" stroke-width="3" marker-end="url(#a)"/>
+<text x="1068" y="312" text-anchor="middle" class="lab">EF Core</text>
+
+<path d="M640 432 C565 432,535 432,475 432" fill="none" stroke="#2fa67b" stroke-width="3" marker-end="url(#a)"/>
+<text x="555" y="415" text-anchor="middle" class="lab">SignalR events</text>
+
+<line x1="610" y1="742" x2="690" y2="585" stroke="#d78b32" stroke-width="2.5" stroke-dasharray="8 7" marker-end="url(#a)"/>
+<line x1="990" y1="742" x2="915" y2="585" stroke="#7868cf" stroke-width="2.5" stroke-dasharray="8 7" marker-end="url(#a)"/>
+
+<text x="800" y="872" text-anchor="middle" class="sm">JobTrack • client-server architecture with real-time notifications and browser-based automated testing</text>
+</svg>

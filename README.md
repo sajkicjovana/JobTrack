@@ -1,17 +1,36 @@
 # JobTrack
 
-JobTrack is a web application for tracking job applications and preparing for technical interviews.
+JobTrack je web aplikacija za praćenje prijava za posao i pripremu za tehničke intervjue.
 
-The application allows users to organize their job search, track interview processes, practice technical topics through tests, and monitor their preparation progress.
+Aplikacija omogućava korisniku da na jednom mestu vodi evidenciju o prijavama i intervjuima, prati status procesa selekcije, priprema se kroz materijale i testove po tehnologijama i prati svoj napredak. Sistem ima i administratorski deo za upravljanje sadržajem za pripremu.
 
-## Features
+## Sadržaj
 
-### User
+- [Funkcionalni pregled](#funkcionalni-pregled)
+- [Arhitektura](#arhitektura)
+- [Tehnološki stack](#tehnološki-stack)
+- [Struktura repozitorijuma](#struktura-repozitorijuma)
+- [Uloge i autorizacija](#uloge-i-autorizacija)
+- [Baza podataka](#baza-podataka)
+- [Lokalno pokretanje](#lokalno-pokretanje)
+- [Konfiguracija](#konfiguracija)
+- [Postavljanje u radno okruženje](#postavljanje-u-radno-okruženje)
+- [Real-time obaveštenja](#real-time-obaveštenja)
+- [Testiranje](#testiranje)
+- [Troubleshooting](#troubleshooting)
+- [Status projekta](#status-projekta)
+- [Autor](#autor)
 
-- Registration and login
-- JWT-based authentication
-- Job application management
-- Application statuses:
+## Funkcionalni pregled
+
+### Korisnički deo
+
+JobTrack korisniku omogućava:
+
+- registraciju i prijavu
+- pregled dashboard-a sa osnovnim statistikama
+- dodavanje, izmenu i brisanje prijava za posao
+- praćenje statusa prijave:
   - Saved
   - Applied
   - HR Interview
@@ -19,27 +38,42 @@ The application allows users to organize their job search, track interview proce
   - Offer
   - Rejected
   - No Response
-- Search and filtering of job applications
-- Technologies associated with job applications
-- Interview tracking
-- Technical interview preparation materials
-- Tests grouped by technologies and topics
-- Automatic calculation of test results
-- Preparation progress by technology
-- Job readiness based on technologies required by job applications
-- Dashboard with statistics and recent activity
-- Real-time notifications when a new test is published
+- povezivanje prijave sa jednom ili više tehnologija
+- pretragu i filtriranje prijava po kompaniji, poziciji, statusu i tehnologiji
+- evidentiranje intervjua
+- praćenje datuma, tipa, kontakta i ishoda intervjua
+- pregled materijala za pripremu po tehnologijama i temama
+- rešavanje testova
+- automatsko računanje rezultata testa
+- praćenje napretka po tehnologijama
+- prikaz Job Readiness vrednosti na osnovu tehnologija vezanih za prijave
+- pregled prethodnih rezultata testova
+- real-time obaveštenje kada administrator objavi novi test
 
-### Admin
+### Administratorski deo
 
-- Technology management
-- Topic and study material management
-- Question and answer management
-- Test creation and editing
-- Publishing and unpublishing tests
-- Real-time synchronization of published tests with connected users
+Administrator može da upravlja sadržajem koji se koristi za pripremu:
 
-## Technologies
+- tehnologijama
+- temama
+- materijalima za učenje
+- pitanjima i ponuđenim odgovorima
+- testovima
+- objavljivanjem i povlačenjem testova
+
+Kada administrator objavi ili povuče test, promena se prosleđuje povezanim korisnicima preko SignalR-a.
+
+## Arhitektura
+
+![JobTrack - System Architecture](docs/architecture/jobtrack-architecture.svg)
+
+JobTrack koristi klijent-server arhitekturu.
+
+Angular aplikacija predstavlja frontend sloj i komunicira sa ASP.NET Core Web API backend-om preko HTTP/REST zahteva. Backend sadrži poslovnu logiku, autentifikaciju, autorizaciju i pristup podacima. Entity Framework Core se koristi za komunikaciju sa PostgreSQL bazom i za migracije.
+
+SignalR omogućava real-time komunikaciju između backend-a i povezanih Angular klijenata, dok Selenium Page Object Model testovi proveravaju odabrane korisničke tokove kroz pravi browser.
+
+## Tehnološki stack
 
 ### Frontend
 
@@ -47,8 +81,9 @@ The application allows users to organize their job search, track interview proce
 - TypeScript
 - SCSS
 - Angular Forms
+- Angular Router
 - SignalR client
-- Marked for rendering Markdown study materials
+- Marked za prikaz Markdown materijala
 
 ### Backend
 
@@ -56,261 +91,394 @@ The application allows users to organize their job search, track interview proce
 - .NET 9
 - Entity Framework Core
 - PostgreSQL
-- JWT authentication
+- Npgsql
+- JWT autentifikacija i autorizacija
 - SignalR
 
-### Testing
+### Test automation
 
-- xUnit
-- Entity Framework Core InMemory
+- Java
+- Maven
 - Selenium WebDriver
+- TestNG
+- WebDriverManager
 - Page Object Model
 
-## Architecture
-
-JobTrack uses a client-server architecture.
-
-```text
-Angular Client
-      |
-      | HTTP / REST
-      v
-ASP.NET Core Web API
-      |
-      | Entity Framework Core
-      v
-PostgreSQL Database
-
-ASP.NET Core
-      |
-      | SignalR
-      v
-Angular Client
-```
-
-The Angular application communicates with the ASP.NET Core backend through REST API endpoints.
-
-Entity Framework Core is used for database access and migrations.
-
-SignalR is used for real-time communication. When an administrator publishes or unpublishes a test, connected users receive the change without refreshing the page.
-
-## Project Structure
+## Struktura repozitorijuma
 
 ```text
 JobTrack/
-│
-├── client/
-│   └── Angular frontend
-│
-├── server/
-│   ├── JobTrack.Api/
-│   │   └── ASP.NET Core Web API
-│   │
-│   ├── JobTrack.Tests/
-│   │   └── Backend tests
-│   │
-│   ├── JobTrack.UiTests/
-│   │   └── Selenium end-to-end tests
-│   │
-│   └── JobTrack.sln
-│
-└── README.md
+  README.md
+  .gitignore
+
+  client/
+    src/
+      app/
+    package.json
+    angular.json
+
+  server/
+    JobTrack.Api/
+      Controllers/
+      Data/
+      Models/
+      Services/
+      Migrations/
+    JobTrack.sln
+
+  page-object-model/
+    pom.xml
+    testng.xml
+    src/
+      main/java/pmf/imi/moodle/
+        BasePageModel.java
+        LoginPage.java
+        ApplicationsPage.java
+      test/java/pmf/imi/moodle/
+        LoginPageTest.java
+        ApplicationsPageTest.java
+
+  docs/
+    architecture/
+      jobtrack-architecture.svg
+    ...
 ```
 
-## Database
+## Uloge i autorizacija
 
-The application uses PostgreSQL.
+Sistem koristi dve uloge:
 
-The database contains entities for:
+- `User`
+- `Admin`
 
-- Users
-- Job applications
-- Technologies
-- Interviews
-- Topics
-- Questions
-- Answer options
-- Tests
-- Test attempts
-- Test answers
+`User` koristi funkcionalnosti vezane za svoje prijave, intervjue, pripremu i rezultate.
 
-Entity Framework Core migrations are included in the project.
+`Admin` ima pristup administratorskom panelu i upravlja tehnologijama, temama, pitanjima i testovima.
 
-## Running the Project Locally
+Autentifikacija je zasnovana na JWT tokenima. Backend proverava identitet i ulogu korisnika pre pristupa zaštićenim funkcionalnostima.
 
-### Prerequisites
+Korisnik može da pristupa i menja samo podatke koji pripadaju njegovom nalogu, kao što su njegove prijave, intervjui i rezultati testova.
 
-Install:
+## Baza podataka
+
+Aplikacija koristi PostgreSQL bazu podataka.
+
+Glavne grupe podataka su:
+
+- korisnici
+- prijave za posao
+- tehnologije
+- veze prijava i tehnologija
+- intervjui
+- teme
+- pitanja
+- ponuđeni odgovori
+- testovi
+- pitanja testova
+- pokušaji rešavanja testova
+- odgovori korisnika
+
+Entity Framework Core se koristi za mapiranje modela i rad sa bazom.
+
+Migracije se nalaze u backend projektu i koriste se za kreiranje i ažuriranje šeme baze.
+
+## Lokalno pokretanje
+
+### Preduslovi
+
+Za pokretanje projekta potrebno je imati:
 
 - .NET 9 SDK
-- Node.js and npm
+- Node.js i npm
 - Angular CLI
 - PostgreSQL
+- JDK 17 ili noviji za Selenium testove
+- Google Chrome
+- Maven ili IntelliJ IDEA sa Maven podrškom
 
-### Backend configuration
+### 1. PostgreSQL
 
-The backend uses .NET User Secrets for sensitive local configuration.
+Potrebno je kreirati lokalnu PostgreSQL bazu.
 
-Navigate to:
+Razvojna baza korišćena u projektu:
+
+```text
+jobtrack_db
+```
+
+### 2. Backend
+
+Otvoriti:
 
 ```bash
 cd server/JobTrack.Api
 ```
 
-Initialize User Secrets:
+Lokalni osetljivi podaci čuvaju se pomoću .NET User Secrets.
 
-```bash
-dotnet user-secrets init
-```
-
-Set the PostgreSQL connection string:
+Primer connection string-a:
 
 ```bash
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5433;Database=jobtrack_db;Username=postgres;Password=YOUR_PASSWORD"
 ```
 
-Set the JWT key:
+JWT ključ:
 
 ```bash
 dotnet user-secrets set "Jwt:Key" "YOUR_SECRET_JWT_KEY"
 ```
 
-Apply database migrations:
+Primena migracija:
 
 ```bash
 dotnet ef database update
 ```
 
-Run the backend:
+Pokretanje backend-a:
 
 ```bash
 dotnet run
 ```
 
-By default, the API runs at:
+Backend se lokalno pokreće na:
 
 ```text
 http://localhost:5254
 ```
 
-Swagger is available at:
+Swagger je dostupan na:
 
 ```text
 http://localhost:5254/swagger
 ```
 
-### Frontend
+### 3. Frontend
 
-Navigate to:
+Otvoriti novi terminal:
 
 ```bash
 cd client
 ```
 
-Install dependencies:
+Instalirati zavisnosti:
 
 ```bash
 npm install
 ```
 
-Run the Angular application:
+Pokrenuti aplikaciju:
 
 ```bash
 ng serve
 ```
 
-The frontend is available at:
+Frontend je dostupan na:
 
 ```text
 http://localhost:4200
 ```
 
-## Testing
+## Konfiguracija
 
-### Backend Tests
+Osetljiva lokalna konfiguracija se ne čuva u repozitorijumu.
 
-Backend and business logic are tested using xUnit and an Entity Framework Core InMemory database.
+Za razvojno okruženje koriste se .NET User Secrets za:
 
-Run:
+- PostgreSQL connection string
+- JWT signing key
+
+Na ovaj način lozinka baze i JWT ključ nisu deo `appsettings.json` fajla koji se objavljuje u repozitorijumu.
+
+Frontend u lokalnom okruženju komunicira sa API-jem na:
+
+```text
+http://localhost:5254
+```
+
+Backend prihvata zahteve Angular aplikacije koja se lokalno pokreće na:
+
+```text
+http://localhost:4200
+```
+
+## Postavljanje u radno okruženje
+
+Aplikacija se trenutno demonstrira u lokalnom razvojnom okruženju.
+
+Postupak prebacivanja u produkciono radno okruženje obuhvata sledeće korake:
+
+1. Obezbediti PostgreSQL bazu dostupnu backend serveru.
+2. Podesiti produkcioni connection string i JWT ključ kao server secrets ili environment promenljive.
+3. Primeniti Entity Framework Core migracije nad produkcionom bazom.
+4. Build-ovati i postaviti ASP.NET Core Web API na server sa podrškom za .NET 9.
+5. Build-ovati Angular aplikaciju produkcionom komandom.
+6. Postaviti generisane Angular statičke fajlove na odgovarajući web server ili frontend hosting.
+7. Zameniti lokalne API adrese produkcionim adresama.
+8. Podesiti CORS tako da backend prihvata zahteve sa produkcionog frontend domena.
+9. Obezbediti HTTPS komunikaciju.
+10. Omogućiti WebSocket konekcije koje SignalR koristi za real-time komunikaciju.
+11. Nakon postavljanja proveriti autentifikaciju, rad sa prijavama, intervjuima, testovima, administratorski deo i SignalR obaveštenja.
+
+Produkcione tajne ne treba čuvati u izvornom kodu niti u javnom repozitorijumu.
+
+## Real-time obaveštenja
+
+JobTrack koristi SignalR za komunikaciju u realnom vremenu.
+
+Osnovni tok pri objavljivanju testa:
+
+1. Administrator objavljuje test.
+2. Backend čuva promenu.
+3. SignalR hub šalje događaj trenutno povezanim klijentima.
+4. Korisnik odmah dobija obaveštenje bez osvežavanja stranice.
+5. Ako je korisnik već na Preparation stranici, lista dostupnih testova se osvežava.
+6. Korisnik preko obaveštenja može da ode do odgovarajućeg dela za pripremu.
+
+Sličan tok se koristi kada administrator povuče prethodno objavljeni test.
+
+## Testiranje
+
+Automatizovano UI testiranje realizovano je korišćenjem Selenium WebDriver-a u Javi, TestNG-a i Page Object Model obrasca.
+
+Lokacija:
+
+```text
+page-object-model/
+```
+
+### Struktura
+
+Page Object klase:
+
+```text
+src/main/java/pmf/imi/moodle/
+```
+
+Test klase:
+
+```text
+src/test/java/pmf/imi/moodle/
+```
+
+Test suite:
+
+```text
+testng.xml
+```
+
+Zajednička bazna klasa:
+
+```text
+BasePageModel.java
+```
+
+### Pokretanje
+
+Pre testiranja moraju biti pokrenuti backend i frontend.
+
+Ako je Maven dostupan iz terminala:
 
 ```bash
-cd server
-dotnet test ./JobTrack.Tests/JobTrack.Tests.csproj
+cd page-object-model
+mvn clean test
 ```
 
-The current backend test suite contains 7 tests.
+Testovi se mogu pokrenuti i iz IntelliJ IDEA preko Maven `test` lifecycle komande.
 
-The tests cover scenarios such as:
+### Trenutni test suite
 
-- Creating job applications
-- Invalid technologies
-- User ownership of job applications
-- Starting published tests
-- Preventing unpublished tests from being started
-- Preventing completed test attempts from being submitted again
+Suite trenutno sadrži 7 testova.
 
-### Selenium Tests
+`LoginPageTest` proverava:
 
-Basic end-to-end user flows are tested using Selenium WebDriver and the Page Object Model.
+- otvaranje login stranice i URL
+- prikaz greške za neispravne kredencijale
+- uspešnu prijavu
 
-Before running the Selenium tests, both the backend and frontend must be running.
+`ApplicationsPageTest` proverava:
 
-Set test user credentials in PowerShell:
+- otvaranje Job Applications stranice
+- otvaranje forme za novu prijavu
+- dostupne opcije status filtera
+- unos teksta u search polje
 
-```powershell
-$env:JOBTRACK_TEST_EMAIL="your-test-user@example.com"
-$env:JOBTRACK_TEST_PASSWORD="your-test-password"
+Poslednje pokretanje suite-a:
+
+```text
+Tests run: 7
+Failures: 0
+Errors: 0
+Skipped: 0
+BUILD SUCCESS
 ```
 
-Then run:
+Page Object Model odvaja lokatore i operacije nad stranicama od samih test scenarija, pa test klase ostaju preglednije i jednostavnije za održavanje.
 
-```bash
-dotnet test ./JobTrack.UiTests/JobTrack.UiTests.csproj
-```
+## Troubleshooting
 
-The Selenium tests cover:
+### Backend ne može da se poveže sa bazom
 
-- Invalid login and error display
-- Authenticated interaction with the job applications page
+Proveriti:
 
-## Security
+- da PostgreSQL servis radi
+- da baza `jobtrack_db` postoji
+- port PostgreSQL servera
+- vrednost `ConnectionStrings:DefaultConnection` u User Secrets
 
-Passwords are stored as hashes.
+### Frontend ne dobija podatke
 
-Authentication is implemented using JWT tokens.
+Proveriti:
 
-Sensitive development configuration such as database passwords and JWT keys is not stored in the repository. Local development secrets are managed using .NET User Secrets.
+- da backend radi na `http://localhost:5254`
+- da frontend koristi odgovarajuću API adresu
+- CORS konfiguraciju backend-a
 
-Authorization is role-based and separates User and Admin functionality.
+### Login ne radi
 
-Users can only access and modify their own job applications, interviews, and test results.
+Proveriti:
 
-## Real-Time Notifications
+- da backend i baza rade
+- da korisnički nalog postoji
+- da JWT konfiguracija postoji u User Secrets
 
-SignalR is used to provide real-time communication between the backend and connected clients.
+### SignalR obaveštenje se ne pojavljuje
 
-When an administrator publishes a test:
+Proveriti:
 
-1. The backend saves the new publication state.
-2. A SignalR event is sent to connected users.
-3. The user receives a notification immediately.
-4. If the user is already on the Preparation page, the available tests are updated without refreshing the page.
+- da su backend i frontend pokrenuti
+- da je korisnik prijavljen
+- da SignalR konekcija može da se uspostavi
+- da test zaista menja publish/unpublish stanje
 
-The same mechanism is used when a test is unpublished.
+### Selenium testovi ne mogu da se pokrenu
 
-## Deployment
+Proveriti:
 
-Production deployment will include:
+- da Chrome postoji
+- da backend radi
+- da frontend radi na `http://localhost:4200`
+- da postoji test korisnik koji test koristi
+- da su Maven zavisnosti učitane
 
-- Angular frontend hosting
-- ASP.NET Core API hosting
-- PostgreSQL database hosting
-- Environment-based configuration for production secrets and URLs
+## Status projekta
 
-Production links will be added after deployment.
+JobTrack trenutno pokriva glavne planirane funkcionalnosti:
 
-## Author
+- autentifikaciju i autorizaciju
+- praćenje prijava za posao
+- praćenje intervjua
+- materijale i testove za tehničku pripremu
+- rezultate i napredak
+- Job Readiness prikaz
+- administratorsko upravljanje sadržajem
+- SignalR real-time obaveštenja
+- Selenium Page Object Model automatizovane testove
 
-Jovana Šajkić 95/2022
+Projekat je spreman za lokalnu demonstraciju funkcionalnosti i automatizovano testiranje.
+
+## Autor
+
+**Jovana Šajkić**  
+Student ID: **95/2022**  
 Prirodno-matematički fakultet, Univerzitet u Kragujevcu  
 Institut za matematiku i informatiku
