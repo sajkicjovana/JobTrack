@@ -65,7 +65,7 @@ Kada administrator objavi ili povuče test, promena se prosleđuje povezanim kor
 
 ## Arhitektura
 
-![JobTrack - System Architecture](docs/architecture/jobtrack-architecture.svg)
+![JobTrack - System Architecture](docs/architecture/jobtrack-architecture.png)
 
 JobTrack koristi klijent-server arhitekturu.
 
