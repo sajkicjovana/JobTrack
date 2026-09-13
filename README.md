@@ -478,7 +478,6 @@ Projekat je spreman za lokalnu demonstraciju funkcionalnosti i automatizovano te
 
 ## Autor
 
-**Jovana Šajkić**  
-Student ID: **95/2022**  
+**Jovana Šajkić 95/2022**  
 Prirodno-matematički fakultet, Univerzitet u Kragujevcu  
 Institut za matematiku i informatiku
